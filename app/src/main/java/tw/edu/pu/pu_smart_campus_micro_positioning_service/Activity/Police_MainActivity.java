@@ -8,10 +8,12 @@ import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.material.button.MaterialButton;
 import com.permissionx.guolindev.PermissionX;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
@@ -19,6 +21,7 @@ import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 public class Police_MainActivity extends AppCompatActivity {
 
     private LottieAnimationView btnMonitor, btnGuide, btnSafety, btnCheck;
+    private MaterialButton btnSignOut;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +39,7 @@ public class Police_MainActivity extends AppCompatActivity {
         btnGuide = findViewById(R.id.lottieGuide);
         btnSafety = findViewById(R.id.lottieSafety);
         btnCheck = findViewById(R.id.lottieCheck);
+        btnSignOut = findViewById(R.id.btn_SignOut);
     }
 
     private void initView() {
@@ -44,7 +48,8 @@ public class Police_MainActivity extends AppCompatActivity {
         });
 
         btnGuide.setOnClickListener(v -> {
-
+            Intent ii = new Intent(getApplicationContext(), GuideActivity.class);
+            startActivity(ii);
         });
 
         btnSafety.setOnClickListener(v -> {
@@ -55,6 +60,8 @@ public class Police_MainActivity extends AppCompatActivity {
         btnCheck.setOnClickListener(v -> {
 
         });
+
+        btnSignOut.setOnClickListener(v -> finish());
     }
 
     /**
@@ -62,17 +69,23 @@ public class Police_MainActivity extends AppCompatActivity {
      * by using implementation PermissionX
      */
     private void requestPermission() {
-        PermissionX.init(this)
-                .permissions(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+        if (Build.VERSION.SDK_INT >= 23) {
+            PermissionX.init(this)
+                    .permissions(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
 
-                .onExplainRequestReason((scope, deniedList) -> scope.showRequestReasonDialog(
-                        deniedList, "Grant Permission!", "Sure", "Cancel"))
+                    .onExplainRequestReason((scope, deniedList) -> scope.showRequestReasonDialog(
+                            deniedList, "Grant Permission!", "Sure", "Cancel"))
 
-                .request((allGranted, grantedList, deniedList) -> {
-                    if (!allGranted) {
-                        Toast.makeText(getApplicationContext(), "Grant Permission failed!", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                    .request((allGranted, grantedList, deniedList) -> {
+                        if (!allGranted) {
+                            Toast.makeText(getApplicationContext(), "Grant Permission failed!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
+        else {
+            Toast.makeText(getApplicationContext(), "您的手機無法使用該應用...", Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 
     private void requestBluetooth() {

@@ -92,25 +92,27 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
                     String minor = String.valueOf(beacons.iterator().next().getId3());
                     int RSSI = beacons.iterator().next().getRssi();
                     String address = beacons.iterator().next().getBluetoothAddress();
-                    List<Identifier> identifier = beacons.iterator().next().getIdentifiers();
+                    int txPower = beacons.iterator().next().getTxPower();
+                    String btName = beacons.iterator().next().getBluetoothName();
+
 
                     @SuppressLint("DefaultLocale")
-                    String str = String.format("Distance: %s%nUniqueID: %s%nMajor: %s%nMinor: %s%nRSSI: %d%nAddress: %s%nIdentifier: %s%n",
-                            distance, uniqueID, major, minor, RSSI, address, identifier);
+                    String str = String.format("Distance: %s%nUniqueID: %s%nMajor: %s%nMinor: %s%nRSSI: %d%nAddress: %s%nTxPower: %d%nBtName : %s%n",
+                            distance, uniqueID, major, minor, RSSI, address, txPower, btName);
 
                     tvShowDisplay.setText(str);
                     Log.e(TAG, str);
 
-                    if (uniqueID.equals(myUniqueID)) {
-                        beaconManager.unbind(SafetyActivity.this);
-                        beaconManager.removeAllRangeNotifiers();
-                        new AlertDialog.Builder(SafetyActivity.this)
-                                .setTitle("Welcome To Providence University!")
-                                .setMessage("Location: Xijia Schultz Hall\nPlace: 1F\n")
-                                .setPositiveButton("Ok", null)
-                                .setNegativeButton("Cancel", null)
-                                .show();
-                    }
+//                    if (uniqueID.equals(myUniqueID)) {
+//                        beaconManager.unbind(SafetyActivity.this);
+//                        beaconManager.removeAllRangeNotifiers();
+//                        new AlertDialog.Builder(SafetyActivity.this)
+//                                .setTitle("Welcome To Providence University!")
+//                                .setMessage("Location: Xijia Schultz Hall\nPlace: 1F\n")
+//                                .setPositiveButton("Ok", null)
+//                                .setNegativeButton("Cancel", null)
+//                                .show();
+//                    }
                 }
                 else {
                     tvShowDisplay.setText("Nothing...");
@@ -120,9 +122,9 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
         });
 
         try {
-            beaconManager.startRangingBeaconsInRegion(new Region("", null, null, null));
+            beaconManager.startRangingBeacons(new Region("", null, null, null));
 
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
