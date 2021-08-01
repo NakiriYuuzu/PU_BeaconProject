@@ -93,10 +93,21 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
                 if (beacons.size() > 0) {
                     for (Beacon beacon: beacons) {
-                        Log.e(TAG, String.format("Region:%s & Distance:%.2fm & RSSI:%d",
-                                region.getUniqueId(), beacon.getDistance(), beacon.getRssi()));
-                        Log.e(TAG,
-                                "The beacon I see is about " + beacon.getDistance() + " meters away.");
+                        String distance = String.valueOf(beacons.iterator().next().getDistance());
+                        String uniqueID = String.valueOf(beacons.iterator().next().getId1());
+                        String major = String.valueOf(beacons.iterator().next().getId2());
+                        String minor = String.valueOf(beacons.iterator().next().getId3());
+                        int RSSI = beacons.iterator().next().getRssi();
+                        String address = beacons.iterator().next().getBluetoothAddress();
+                        int txPower = beacons.iterator().next().getTxPower();
+                        String btName = beacons.iterator().next().getBluetoothName();
+
+                        @SuppressLint("DefaultLocale")
+                        String str = String.format("Distance: %s%nUniqueID: %s%nMajor: %s%nMinor: %s%nRSSI: %d%nAddress: %s%nTxPower: %d%nBtName : %s%n",
+                                distance, uniqueID, major, minor, RSSI, address, txPower, btName);
+
+                        tvShowDisplay.setText(str);
+                        Log.e(TAG, str);
                     }
                 }
                 else {
