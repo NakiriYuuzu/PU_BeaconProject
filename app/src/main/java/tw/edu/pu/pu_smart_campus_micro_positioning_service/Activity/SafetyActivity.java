@@ -2,10 +2,7 @@ package tw.edu.pu.pu_smart_campus_micro_positioning_service.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.util.Log;
 
 import com.google.android.material.button.MaterialButton;
@@ -15,14 +12,16 @@ import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
-import org.altbeacon.beacon.BeaconTransmitter;
-import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconDefine;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 
 public class SafetyActivity extends AppCompatActivity implements BeaconConsumer {
@@ -30,39 +29,39 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
     private final String TAG = "SafetyActivity: ";
     private final String myUniqueID = "594650a2-8621-401f-b5de-6eb3ee398170";
 
-    private Beacon beacon;
     private BeaconManager beaconManager;
-    private BeaconParser beaconParser;
-    private BeaconTransmitter beaconTransmitter;
+    private BeaconDefine beaconDefine;
 
     private MaterialButton btnStart, btnStop;
     private MaterialTextView tvShowDisplay;
-
-    private String uniqueID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_safety);
 
-        findView();
-        buttonInit();
+        initView();
+        initButton();
     }
 
-    private void beaconInit() {
+    private void initBeacon() {
         beaconManager = BeaconManager.getInstanceForApplication(this);
         //beacon AddStone m:0-3=4c000215 or alt beacon = m:2-3=0215
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25"));
+
+        beaconManager.setForegroundBetweenScanPeriod(1000L);
+        beaconManager.setForegroundScanPeriod(1000L);
+
         beaconManager.bind(this);
     }
 
-    private void buttonInit() {
+    private void initButton() {
         btnStart.setOnClickListener(v -> {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    beaconInit();
+                    initBeacon();
                 }
             }).start();
         });
@@ -72,61 +71,69 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
         });
     }
 
-    private void findView() {
+    private void initView() {
         tvShowDisplay = findViewById(R.id.showDisplay);
         btnStart = findViewById(R.id.btn_Receive_Start);
         btnStop = findViewById(R.id.btn_Receive_Stop);
+
+        beaconDefine = new BeaconDefine();
     }
 
     @Override
     public void onBeaconServiceConnect() {
-        beaconManager.removeAllMonitorNotifiers();
         beaconManager.addRangeNotifier(new RangeNotifier() {
-            @SuppressLint("SetTextI18n")
             @Override
-            public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-                if (beacons.size() > 0) {
-                    String distance = String.valueOf(beacons.iterator().next().getDistance());
-                    uniqueID = String.valueOf(beacons.iterator().next().getId1());
-                    String major = String.valueOf(beacons.iterator().next().getId2());
-                    String minor = String.valueOf(beacons.iterator().next().getId3());
-                    int RSSI = beacons.iterator().next().getRssi();
-                    String address = beacons.iterator().next().getBluetoothAddress();
-                    int txPower = beacons.iterator().next().getTxPower();
-                    String btName = beacons.iterator().next().getBluetoothName();
+            public void didRangeBeaconsInRegion(Collection<Beacon> collection, Region region) {
+                Log.i(TAG, "didRangeBeaconsInRegion: 调用了这个方法:" + collection.size());
 
+                if (collection.size() > 0) {
+                    List<Beacon> beacons = new ArrayList<>();
+                    for (Beacon beacon : collection) {
+                        if (beacon.getId1().toString().equalsIgnoreCase(myUniqueID)) {
+                            beacons.add(beacon);
+                        }
+                    }
 
-                    @SuppressLint("DefaultLocale")
-                    String str = String.format("Distance: %s%nUniqueID: %s%nMajor: %s%nMinor: %s%nRSSI: %d%nAddress: %s%nTxPower: %d%nBtName : %s%n",
-                            distance, uniqueID, major, minor, RSSI, address, txPower, btName);
+                    if (beacons.size() > 0) {
+                        Collections.sort(beacons, new Comparator<Beacon>() {
+                            public int compare(Beacon arg0, Beacon arg1) {
+                                return (int) (arg1.getDistance() - arg0.getDistance());
+                            }
+                        });
 
-                    tvShowDisplay.setText(str);
-                    Log.e(TAG, str);
+                        Beacon nearBeacon = beacons.get(0);
+                        String major = nearBeacon.getId2().toString();
+                        String minor = nearBeacon.getId3().toString();
+                        String rssi = String.valueOf(nearBeacon.getRssi());
+                        String distance = String.valueOf(nearBeacon.getDistance());
+                        String txPower = String.valueOf(nearBeacon.getTxPower());
 
-//                    if (uniqueID.equals(myUniqueID)) {
-//                        beaconManager.unbind(SafetyActivity.this);
-//                        beaconManager.removeAllRangeNotifiers();
-//                        new AlertDialog.Builder(SafetyActivity.this)
-//                                .setTitle("Welcome To Providence University!")
-//                                .setMessage("Location: Xijia Schultz Hall\nPlace: 1F\n")
-//                                .setPositiveButton("Ok", null)
-//                                .setNegativeButton("Cancel", null)
-//                                .show();
-//                    }
-                }
-                else {
-                    tvShowDisplay.setText("Nothing...");
-                    Log.e(TAG, String.valueOf(beacons.size()));
+                        String location = beaconDefine.getLocationMsg(major, minor);
+                        Log.i(TAG, "didRangeBeaconsInRegion: " + beacons.toString());
+
+                        updateTextViewMsg(location);
+                    }
                 }
             }
+
         });
 
         try {
-            beaconManager.startRangingBeacons(new Region("", null, null, null));
+            beaconManager.startRangingBeacons(new Region(myUniqueID, null, null, null));
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void updateTextViewMsg(final String location) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                tvShowDisplay.setText(location);
+            }
+        });
+
     }
 
     @Override

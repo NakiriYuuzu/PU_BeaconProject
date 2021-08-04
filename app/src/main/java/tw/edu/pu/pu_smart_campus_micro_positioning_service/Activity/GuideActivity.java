@@ -20,6 +20,8 @@ import org.altbeacon.beacon.Region;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconDefine;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
@@ -29,37 +31,52 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
     private final String TAG = "SafetyActivity: ";
     private final String UNIQUE_ID = "594650a2-8621-401f-b5de-6eb3ee398170";
 
-    private final float DISTANCE_THRESHOLD = 2.5f;
+    private static final long DEFAULT_FOREGROUND_SCAN_PERIOD = 1000L; // 1sec
+    private static final long DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD = 1000L; // 1sec
+
+    private final float DISTANCE_THRESHOLD = 3.5f;
+
+    private boolean beaconIsRunning = false;
 
     private BeaconManager beaconManager;
 
     private MaterialButton btnStart, btnStop;
     private MaterialTextView tvShowDisplay;
 
-    private boolean beaconIsRunning = false;
-
     private ArrayList<HashMap<String, String>> beaconMap = new ArrayList<>();
     private HashMap<String, Integer> regionMap = new HashMap<>();
+    private ArrayList<Beacon> beaconList = new ArrayList<>();
+
+    private Timer timer = new Timer();
+    private TimerTask task = new TimerTask() {
+        @Override
+        public void run() {
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guide);
 
-        Init();
+        initView();
         buttonInit();
     }
 
     private void beaconInit() {
-            beaconManager = BeaconManager.getInstanceForApplication(this);
+        beaconManager = BeaconManager.getInstanceForApplication(this);
 
-            //beacon AddStone m:0-3=4c000215 or alt beacon = m:2-3=0215
-            beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
-            beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25"));
+        //beacon AddStone m:0-3=4c000215 or alt beacon = m:2-3=0215
+        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
+        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25"));
 
-            beaconIsRunning = true;
+        beaconManager.setForegroundBetweenScanPeriod(DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD);
+        beaconManager.setForegroundScanPeriod(DEFAULT_FOREGROUND_SCAN_PERIOD);
 
-            beaconManager.bind(this);
+        beaconIsRunning = true;
+
+        beaconManager.bind(this);
     }
 
     private void buttonInit() {
@@ -76,52 +93,53 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
         });
     }
 
-    private void Init() {
+    private void initView() {
         //findView
         tvShowDisplay = findViewById(R.id.tv_Guide_information);
         btnStart = findViewById(R.id.btn_Guide_Start);
         btnStop = findViewById(R.id.btn_Guide_Stop);
-
     }
 
     @Override
     public void onBeaconServiceConnect() {
         beaconManager.removeAllMonitorNotifiers();
+        beaconManager.removeAllRangeNotifiers();
+
         beaconManager.addRangeNotifier(new RangeNotifier() {
             @SuppressLint("SetTextI18n")
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
                 if (beacons.size() > 0) {
-                    for (Beacon beacon: beacons) {
-                        String distance = String.valueOf(beacons.iterator().next().getDistance());
-                        String uniqueID = String.valueOf(beacons.iterator().next().getId1());
-                        String major = String.valueOf(beacons.iterator().next().getId2());
-                        String minor = String.valueOf(beacons.iterator().next().getId3());
-                        int RSSI = beacons.iterator().next().getRssi();
-                        String address = beacons.iterator().next().getBluetoothAddress();
-                        int txPower = beacons.iterator().next().getTxPower();
-                        String btName = beacons.iterator().next().getBluetoothName();
+                    for (Beacon beaconData : beacons) {
+                        String distance = String.valueOf(beaconData.getDistance());
+                        String uniqueID = String.valueOf(beaconData.getId1());
+                        String major = String.valueOf(beaconData.getId2());
+                        String minor = String.valueOf(beaconData.getId3());
+                        String RSSI = String.valueOf(beaconData.getRssi());
+                        String address = beaconData.getBluetoothAddress();
+                        String txPower = String.valueOf(beaconData.getTxPower());
 
                         @SuppressLint("DefaultLocale")
-                        String str = String.format("Distance: %s%nUniqueID: %s%nMajor: %s%nMinor: %s%nRSSI: %d%nAddress: %s%nTxPower: %d%nBtName : %s%n",
-                                distance, uniqueID, major, minor, RSSI, address, txPower, btName);
+                        String str = String.format("Distance: %s%nUniqueID: %s%nMajor: %s%nMinor: %s%nRSSI: %s%nAddress: %s%nTxPower: %s%n",
+                                distance, uniqueID, major, minor, RSSI, address, txPower);
+
+                        if (beaconData.getId1().toString().equalsIgnoreCase(UNIQUE_ID)) {
+                            beaconList.add(beaconData);
+                        }
 
                         tvShowDisplay.setText(str);
+
                         Log.e(TAG, str);
                     }
-                }
-                else {
-                    tvShowDisplay.setText("Nothing...");
-                    Log.e(TAG, String.valueOf(beacons.size()));
                 }
             }
         });
 
         try {
-            beaconManager.startRangingBeacons(new Region(BeaconDefine.POINT_01, Identifier.parse(UNIQUE_ID), null, null));
+            beaconManager.startRangingBeacons(new Region(BeaconDefine.POINT_01, null, Identifier.fromInt(87), null));
             regionMap.put(BeaconDefine.POINT_01, 101);
 
-            beaconManager.startRangingBeacons(new Region(BeaconDefine.POINT_02, Identifier.parse(UNIQUE_ID), null, null));
+            beaconManager.startRangingBeacons(new Region(BeaconDefine.POINT_02, Identifier.parse(UNIQUE_ID), Identifier.fromInt(89), null));
             regionMap.put(BeaconDefine.POINT_02, 102);
 
         } catch (Exception e) {

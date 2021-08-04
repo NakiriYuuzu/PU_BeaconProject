@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "tw.edu.pu.pu_smart_campus_micro_positioning_service"
-        minSdk 21
+        minSdk 23
         targetSdk 30
         versionCode 1
         versionName "1.0"
