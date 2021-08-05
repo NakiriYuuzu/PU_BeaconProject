@@ -86,7 +86,7 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
                 public void run() {
                     beaconInit();
                 }
-            });
+            }).start();
         });
 
         btnStop.setOnClickListener(v -> {
