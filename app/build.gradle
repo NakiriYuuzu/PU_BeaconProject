@@ -40,4 +40,5 @@ dependencies {
     implementation 'org.altbeacon:android-beacon-library:2+'
     implementation 'com.permissionx.guolindev:permissionx:1.4.0'
     implementation 'com.airbnb.android:lottie:4.0.0'
+    implementation "com.android.volley:volley:1.2.0"
 }

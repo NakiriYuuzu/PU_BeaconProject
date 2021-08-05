@@ -69,7 +69,7 @@ public class Police_MainActivity extends AppCompatActivity {
      * by using implementation PermissionX
      */
     private void requestPermission() {
-        if (Build.VERSION.SDK_INT >= 23) {
+        if (Build.VERSION.SDK_INT > 23) {
             PermissionX.init(this)
                     .permissions(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
 

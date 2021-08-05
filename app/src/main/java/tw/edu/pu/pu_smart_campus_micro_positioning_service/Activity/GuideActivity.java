@@ -31,8 +31,8 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
     private final String TAG = "SafetyActivity: ";
     private final String UNIQUE_ID = "594650a2-8621-401f-b5de-6eb3ee398170";
 
-    private static final long DEFAULT_FOREGROUND_SCAN_PERIOD = 1000L; // 1sec
-    private static final long DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD = 1000L; // 1sec
+    private static final long DEFAULT_FOREGROUND_SCAN_PERIOD = 500L; // half sec
+    private static final long DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD = 500L; // half sec
 
     private final float DISTANCE_THRESHOLD = 3.5f;
 
@@ -81,7 +81,12 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
 
     private void buttonInit() {
         btnStart.setOnClickListener(v -> {
-            beaconInit();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    beaconInit();
+                }
+            });
         });
 
         btnStop.setOnClickListener(v -> {
