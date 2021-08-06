@@ -36,6 +36,8 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
     private static final long DEFAULT_FOREGROUND_SCAN_PERIOD = 500L; // half sec
     private static final long DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD = 500L; // half sec
 
+    private final float DISTANCE_THRESHOLD = 3.5f;
+
     private BeaconManager beaconManager;
     private BeaconDefine beaconDefine;
 

@@ -2,10 +2,13 @@ package tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect;
 
 import android.app.Activity;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+
+import java.util.Map;
 
 public class VolleyApi {
 
@@ -22,6 +25,11 @@ public class VolleyApi {
             @Override
             public void onResponse(String response) {
                 try {
+//                    public Map<String, String> getHeaders() throws AuthFailureError {
+//                        Map<String, String> params = new HashMap<String, String>();
+//                        params.put("Authorization", "Bearer "+ yourToken);
+//                        return params;
+//                    }
 
                 } catch (Exception e) {
 
