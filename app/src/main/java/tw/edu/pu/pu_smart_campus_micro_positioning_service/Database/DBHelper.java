@@ -25,7 +25,7 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("create Table users(username TEXT primary key, password TEXT, status BOOL DEFAULT 0)");
-        db.execSQL("create Table spot(major TEXT primary key, spotName TEXT, spotImage BLOB, spotInfo TEXT)");
+        db.execSQL("create Table spot( spotName TEXT primary key, spotImage BLOB, spotInfo TEXT, url TEXT)");
     }
 
     @Override
@@ -34,14 +34,14 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("drop table if exists spot");
     }
 
-    public void insertSpotData(String major, String spotName, byte[] img, String spotInfo){
+    public void insertSpotData(String spotName, byte[] img, String spotInfo, String url){
         SQLiteDatabase myDb = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
-        contentValues.put("major",major);
         contentValues.put("spotName",spotName);
         contentValues.put("image",img);
         contentValues.put("spotInfo",spotInfo);
+        contentValues.put("url",url);
 
         myDb.insert("spot",null,contentValues);
     }

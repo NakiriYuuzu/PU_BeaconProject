@@ -23,7 +23,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -34,7 +37,8 @@ import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
 
     private final String TAG = "SafetyActivity: ";
-    private final String UNIQUE_ID = "594650a2-8621-401f-b5de-6eb3ee398170";
+    private final String IPHONE_ID = "594650a2-8621-401f-b5de-6eb3ee398170";
+    private final String IBEACON_UUID = "699ebc80-e1f3-11e3-9a0f-0cf3ee3bc012";
 
     private static final long DEFAULT_FOREGROUND_SCAN_PERIOD = 500L; // half sec
     private static final long DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD = 500L; // half sec
@@ -44,6 +48,7 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
     private boolean beaconIsRunning = false;
 
     private BeaconManager beaconManager;
+    private BeaconDefine beaconDefine;
 
     private MaterialButton btnStart, btnStop;
     private MaterialTextView tvShowDisplay;
@@ -69,27 +74,29 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
 
         initView();
         buttonInit();
-        createSpotData();
+        //createSpotData();
     }
 
     private void createSpotData() {
         DB = new DBHelper(this);
 
         //從Resource裡拿資訊
-        String major01 = String.valueOf(R.string.Providence_Chapel_Major);
-        String pu_chapel_name = String.valueOf(R.string.Providence_Chapel);
-        String pu_chapel_info = String.valueOf(R.string.Providence_Chapel_Info);
+        String major01 = getResources().getString(R.string.Providence_Chapel_Major);
+        String pu_chapel_name = getResources().getString(R.string.Providence_Chapel);
+        String pu_chapel_info = getResources().getString(R.string.Providence_Chapel_Info);
 
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.providence_chapel);
         ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG,100,byteArray);
         byte[] img_pu_chapel = byteArray.toByteArray();
 
-//        String major02 = String.valueOf(R.string.Providence_Chapel_Major);
+        Log.i("GuideDebug",major01 + pu_chapel_name + img_pu_chapel + pu_chapel_info);
+
+//        String major02 = String.valueOf(R.string.Providence_Hall_Major);
 //        String pu_hall_name = String.valueOf(R.string.Providence_Hall);
 //        String pu_hall_info = String.valueOf(R.string.Providence_Hall_Info);
 
-        DB.insertSpotData(major01, pu_chapel_name, img_pu_chapel, pu_chapel_info);
+        //DB.insertSpotData(pu_chapel_name, img_pu_chapel, pu_chapel_info);
     }
 
     private void beaconInit() {
@@ -131,6 +138,8 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
         tvShowDisplay = findViewById(R.id.tv_Guide_information);
         btnStart = findViewById(R.id.btn_Guide_Start);
         btnStop = findViewById(R.id.btn_Guide_Stop);
+
+        beaconDefine = new BeaconDefine();
     }
 
     @Override
@@ -141,39 +150,71 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
         beaconManager.addRangeNotifier(new RangeNotifier() {
             @SuppressLint("SetTextI18n")
             @Override
-            public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-                if (beacons.size() > 0) {
-                    for (Beacon beaconData : beacons) {
-                        String distance = String.valueOf(beaconData.getDistance());
-                        String uniqueID = String.valueOf(beaconData.getId1());
-                        String major = String.valueOf(beaconData.getId2());
-                        String minor = String.valueOf(beaconData.getId3());
-                        String RSSI = String.valueOf(beaconData.getRssi());
-                        String address = beaconData.getBluetoothAddress();
-                        String txPower = String.valueOf(beaconData.getTxPower());
+            public void didRangeBeaconsInRegion(Collection<Beacon> collection, Region region) {
+                if (collection.size() > 0) {
+                    List<Beacon> beacons = new ArrayList<>();
+                    for (Beacon beaconData : collection) {
+                        if (beaconData.getId1().toString().equalsIgnoreCase(IPHONE_ID) || beaconData.getId1().toString().equalsIgnoreCase(IBEACON_UUID) && beaconData.getDistance() <= 30) {
+                            beacons.add(beaconData);
+                        }
+                    }
+
+                    if(beacons.size() > 0){
+
+                        Collections.sort(beacons, new Comparator<Beacon>() {
+                            @Override
+                            public int compare(Beacon o1, Beacon o2) {
+                                // Rssi 判斷
+                                return o2.getRssi() - o1.getRssi();
+
+                                //Distance 判斷
+                                //return Double.compare(arg0.getDistance(), arg1.getDistance());
+                            }
+                        });
+
+                        Beacon beacon = beacons.get(0);
+                        String distance = String.valueOf(beacon.getDistance());
+                        String uniqueID = String.valueOf(beacon.getId1());
+                        String major = String.valueOf(beacon.getId2());
+                        String minor = String.valueOf(beacon.getId3());
+                        String RSSI = String.valueOf(beacon.getRssi());
+                        String address = beacon.getBluetoothAddress();
+                        String txPower = String.valueOf(beacon.getTxPower());
+
+                        if(beaconDefine.getLocationMsg(major, minor).equals("IBEACON_10")){
+                            String str = String.format("主顾楼");
+                            tvShowDisplay.setText(str);
+                        }
+
+                        if(beaconDefine.getLocationMsg(major, minor).equals("IBEACON_11")){
+                            String str = String.format("主顾楼");
+                            tvShowDisplay.setText(str);
+                        }
+
+                        if(beaconDefine.getLocationMsg(major, minor).equals("IBEACON_12")){
+                            String str = String.format("主顾楼");
+                            tvShowDisplay.setText(str);
+                        }
 
                         @SuppressLint("DefaultLocale")
                         String str = String.format("Distance: %s%nUniqueID: %s%nMajor: %s%nMinor: %s%nRSSI: %s%nAddress: %s%nTxPower: %s%n",
                                 distance, uniqueID, major, minor, RSSI, address, txPower);
 
-                        if (beaconData.getId1().toString().equalsIgnoreCase(UNIQUE_ID)) {
-                            beaconList.add(beaconData);
-                        }
-
-                        tvShowDisplay.setText(str);
-
-                        Log.e(TAG, str);
+//                        tvShowDisplay.setText(str);
+//
+//                        Log.e(TAG, str);
                     }
                 }
             }
         });
 
         try {
-            beaconManager.startRangingBeacons(new Region(BeaconDefine.POINT_01, null, Identifier.fromInt(87), null));
-            regionMap.put(BeaconDefine.POINT_01, 101);
-
-            beaconManager.startRangingBeacons(new Region(BeaconDefine.POINT_02, Identifier.parse(UNIQUE_ID), Identifier.fromInt(89), null));
-            regionMap.put(BeaconDefine.POINT_02, 102);
+            beaconManager.startRangingBeacons(new Region(IBEACON_UUID, null, null, null));
+//            beaconManager.startRangingBeacons(new Region(BeaconDefine.POINT_01, null, Identifier.fromInt(87), null));
+//            regionMap.put(BeaconDefine.POINT_01, 101);
+//
+//            beaconManager.startRangingBeacons(new Region(BeaconDefine.POINT_02, Identifier.parse(UNIQUE_ID), Identifier.fromInt(89), null));
+//            regionMap.put(BeaconDefine.POINT_02, 102);
 
         } catch (Exception e) {
             e.printStackTrace();
