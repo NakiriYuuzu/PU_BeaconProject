@@ -25,9 +25,11 @@
         android:theme="@style/Theme.Pu_Smart_Campus_MicroPositioning_Service" >
         <activity
             android:name=".Activity.CheckActivity"
+            android:screenOrientation="portrait"
             android:exported="true" />
         <activity
             android:name=".Activity.LoginActivity"
+            android:screenOrientation="portrait"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,15 +39,19 @@
         </activity>
         <activity
             android:name=".Activity.SafetyActivity"
+            android:screenOrientation="portrait"
             android:exported="true" />
         <activity
             android:name=".Activity.GuideActivity"
+            android:screenOrientation="portrait"
             android:exported="true" />
         <activity
             android:name=".Activity.MonitorActivity"
+            android:screenOrientation="portrait"
             android:exported="true" />
         <activity
             android:name=".Activity.Police_MainActivity"
+            android:screenOrientation="portrait"
             android:exported="true" >
         </activity>
     </application>
