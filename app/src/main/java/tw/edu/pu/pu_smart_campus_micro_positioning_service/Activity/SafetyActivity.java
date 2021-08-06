@@ -1,5 +1,6 @@
 package tw.edu.pu.pu_smart_campus_micro_positioning_service.Activity;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
@@ -21,8 +22,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.PriorityQueue;
-import java.util.function.ToDoubleFunction;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconDefine;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
@@ -55,7 +54,7 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
 
     private void initBeacon() {
         beaconManager = BeaconManager.getInstanceForApplication(this);
-        //beacon AddStone m:0-3=4c000215 or alt beacon = m:2-3=0215
+
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25"));
 
@@ -130,6 +129,26 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
                         String location = beaconDefine.getLocationMsg(major, minor);
                         Log.e("Debug02", str);
                         Log.e("Debug03", location);
+
+                        if (location.equals(BeaconDefine.IBEACON_21)) {
+                            beaconManager.unbind(SafetyActivity.this);
+                            beaconManager.removeAllRangeNotifiers();
+                            new AlertDialog.Builder(SafetyActivity.this)
+                                    .setTitle("Welcome To Providence University!")
+                                    .setMessage("Location: 主顧樓\n")
+                                    .setPositiveButton("Ok", null)
+                                    .show();
+                        }
+
+                        if (location.equals(BeaconDefine.IBEACON_10)) {
+                            beaconManager.unbind(SafetyActivity.this);
+                            beaconManager.removeAllRangeNotifiers();
+                            new AlertDialog.Builder(SafetyActivity.this)
+                                    .setTitle("Welcome To Providence University!")
+                                    .setMessage("Location: 主顧聖母堂\n")
+                                    .setPositiveButton("Ok", null)
+                                    .show();
+                        }
 
                         updateTextViewMsg(location);
                     }
