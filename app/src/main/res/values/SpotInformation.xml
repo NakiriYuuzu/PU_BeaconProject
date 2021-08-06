@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    <string name="Providence_Chapel_Major">122</string>
+    <string name="Providence_Chapel">主顾聖母堂</string>
+    <string name="Providence_Chapel_Info">
+        屋頂的玻璃十字架在陽光的照射下，呈現出不同的光影變化；
+        教堂自空中可俯瞰出魚的外型，及通往大門的一條筆直路徑，
+        處處巧思傳達了聖經的寓意，因此成為婚紗拍攝的新地標。
+    </string>
+
+    <string name="Providence_Hall_Major">123</string>
+    <string name="Providence_Hall">主顧樓</string>
+    <string name="Providence_Hall_Info">
+        4樓 資管系 
+        5樓 資工系、資傳系
+        6樓 資訊學院、台文系、EMBA
+        7樓 會計室、職涯發展暨產業促進處、國際暨兩岸事務處
+        8樓 校長室、副校長室、秘書處、研發處、人事室
+    </string>
+
+    <string name="Sport_Hall_Major">1</string>
+    <string name="Sport_Hall">若望保祿二世體育館</string>
+    <string name="Sport_hall_Info">
+        羽球館、網球場、排球場、籃球場、體育室。
+    </string>
+
+</resources>

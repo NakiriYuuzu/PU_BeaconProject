@@ -3,6 +3,8 @@ package tw.edu.pu.pu_smart_campus_micro_positioning_service.Activity;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -17,6 +19,8 @@ import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,6 +28,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconDefine;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.Database.DBHelper;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 
 public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
@@ -56,6 +61,8 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
         }
     };
 
+    private DBHelper DB;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +70,27 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
 
         initView();
         buttonInit();
+        createSpotData();
+    }
+
+    private void createSpotData() {
+        DB = new DBHelper(this);
+
+        //從Resource裡拿資訊
+        String major01 = String.valueOf(R.string.Providence_Chapel_Major);
+        String pu_chapel_name = String.valueOf(R.string.Providence_Chapel);
+        String pu_chapel_info = String.valueOf(R.string.Providence_Chapel_Info);
+
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.providence_chapel);
+        ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG,100,byteArray);
+        byte[] img_pu_chapel = byteArray.toByteArray();
+
+//        String major02 = String.valueOf(R.string.Providence_Chapel_Major);
+//        String pu_hall_name = String.valueOf(R.string.Providence_Hall);
+//        String pu_hall_info = String.valueOf(R.string.Providence_Hall_Info);
+
+        DB.insertSpotData(major01, pu_chapel_name, img_pu_chapel, pu_chapel_info);
     }
 
     private void beaconInit() {
