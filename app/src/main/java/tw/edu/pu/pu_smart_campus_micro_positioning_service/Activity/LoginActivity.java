@@ -52,16 +52,11 @@ public class LoginActivity extends AppCompatActivity {
 
             } else {
 
-                if (db.checkUserPassword(user, pass)) {
-                    db.changeStatus(user, 1);
+                if (user.equals(pass)) {
                     Toast.makeText(this, "Sign in Successfully!", Toast.LENGTH_SHORT).show();
                     Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
                     ii.putExtra("ID", user);
                     startActivity(ii);
-
-                } else {
-
-                    Toast.makeText(this, "Invalid Credentials!", Toast.LENGTH_SHORT).show();
                 }
             }
 
