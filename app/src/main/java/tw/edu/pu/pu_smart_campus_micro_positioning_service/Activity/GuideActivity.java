@@ -3,10 +3,20 @@ package tw.edu.pu.pu_smart_campus_micro_positioning_service.Activity;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ListView;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
@@ -48,10 +58,15 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
 
     private boolean beaconIsRunning = false;
 
+    private boolean spot01Enter = false;
+    private boolean spot02Enter = false;
+    private boolean spot03Enter = false;
+
     private BeaconManager beaconManager;
     private BeaconDefine beaconDefine;
 
     private MaterialButton btnStart, btnStop;
+    private Button btn_spot01, btn_spot02, btn_spot03;
     private MaterialTextView tvShowDisplay;
 
     private ArrayList<HashMap<String, String>> beaconMap = new ArrayList<>();
@@ -75,29 +90,33 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
 
         initView();
         buttonInit();
-        //createSpotData();
+        createSpotData();
     }
 
-    private void createSpotData() {
+    private void createSpotData() throws SQLiteException {
         DB = new DBHelper(this);
 
-        //從Resource裡拿資訊
-        String major01 = getResources().getString(R.string.Providence_Chapel_Major);
+        // 從Resource裡拿資訊
+
+        // 主顧聖母堂
         String pu_chapel_name = getResources().getString(R.string.Providence_Chapel);
         String pu_chapel_info = getResources().getString(R.string.Providence_Chapel_Info);
+        String pu_chapel_url = getResources().getString(R.string.Spot_Link);
 
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.providence_chapel);
-        ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG,100,byteArray);
-        byte[] img_pu_chapel = byteArray.toByteArray();
+        // 主顧樓
+        String pu_hall_name = getResources().getString(R.string.Providence_Hall);
+        String pu_hall_info = getResources().getString(R.string.Providence_Hall_Info);
+        String pu_hall_url = getResources().getString(R.string.Spot_Link);
 
-        Log.i("GuideDebug",major01 + pu_chapel_name + img_pu_chapel + pu_chapel_info);
+        // 體育館
+        String sport_hall_name = getResources().getString(R.string.Sport_Hall);
+        String sport_hall_info = getResources().getString(R.string.Sport_hall_Info);
+        String sport_hall_url = getResources().getString(R.string.Spot_Link);
 
-//        String major02 = String.valueOf(R.string.Providence_Hall_Major);
-//        String pu_hall_name = String.valueOf(R.string.Providence_Hall);
-//        String pu_hall_info = String.valueOf(R.string.Providence_Hall_Info);
-
-        //DB.insertSpotData(pu_chapel_name, img_pu_chapel, pu_chapel_info);
+        // 將資料依序存入資料庫
+        DB.insertSpotData(pu_chapel_name, pu_chapel_info, pu_chapel_url);
+        DB.insertSpotData(pu_hall_name, pu_hall_info, pu_hall_url);
+        DB.insertSpotData(sport_hall_name, sport_hall_info, sport_hall_url);
     }
 
     private void beaconInit() {
@@ -132,6 +151,36 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
                 beaconIsRunning = false;
             }
         });
+
+        btn_spot01.setOnClickListener(v -> {
+            spot01Enter = true;
+            Intent intent = new Intent();
+            intent.setClass(GuideActivity.this, GuideSpotActvity.class);
+            Bundle bundle = new Bundle();
+            bundle.putBoolean("spot01",spot01Enter);
+            intent.putExtras(bundle);
+            startActivity(intent);
+        });
+
+        btn_spot02.setOnClickListener(v -> {
+            spot02Enter = true;
+            Intent intent = new Intent();
+            intent.setClass(GuideActivity.this, GuideSpotActvity.class);
+            Bundle bundle = new Bundle();
+            bundle.putBoolean("spot02",spot02Enter);
+            intent.putExtras(bundle);
+            startActivity(intent);
+        });
+
+        btn_spot03.setOnClickListener(v -> {
+            spot03Enter = true;
+            Intent intent = new Intent();
+            intent.setClass(GuideActivity.this, GuideSpotActvity.class);
+            Bundle bundle = new Bundle();
+            bundle.putBoolean("spot03",spot03Enter);
+            intent.putExtras(bundle);
+            startActivity(intent);
+        });
     }
 
     private void initView() {
@@ -139,6 +188,10 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
         tvShowDisplay = findViewById(R.id.tv_Guide_information);
         btnStart = findViewById(R.id.btn_Guide_Start);
         btnStop = findViewById(R.id.btn_Guide_Stop);
+
+        btn_spot01 = findViewById(R.id.btn01);
+        btn_spot02 = findViewById(R.id.btn02);
+        btn_spot03 = findViewById(R.id.btn03);
 
         beaconDefine = new BeaconDefine();
     }
@@ -160,7 +213,7 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
                         }
                     }
 
-                    if(beacons.size() > 0){
+                    if (beacons.size() > 0) {
 
                         Collections.sort(beacons, new Comparator<Beacon>() {
                             @Override
@@ -182,17 +235,17 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
                         String address = beacon.getBluetoothAddress();
                         String txPower = String.valueOf(beacon.getTxPower());
 
-                        if(beaconDefine.getLocationMsg(major, minor).equals("IBEACON_10")){
+                        if (beaconDefine.getLocationMsg(major, minor).equals("IBEACON_10")) {
                             String str = String.format("主顾楼");
                             tvShowDisplay.setText(str);
                         }
 
-                        if(beaconDefine.getLocationMsg(major, minor).equals("IBEACON_11")){
+                        if (beaconDefine.getLocationMsg(major, minor).equals("IBEACON_11")) {
                             String str = String.format("主顾楼");
                             tvShowDisplay.setText(str);
                         }
 
-                        if(beaconDefine.getLocationMsg(major, minor).equals("IBEACON_12")){
+                        if (beaconDefine.getLocationMsg(major, minor).equals("IBEACON_12")) {
                             String str = String.format("主顾楼");
                             tvShowDisplay.setText(str);
                         }
