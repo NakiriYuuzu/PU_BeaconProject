@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="61dp"
         android:layout_marginTop="30dp"
-        android:text="@string/btn_monitor"
+        android:text="@string/title_monitor"
         android:textColor="@color/darkBlue"
         android:textSize="30sp"
         android:textStyle="bold"

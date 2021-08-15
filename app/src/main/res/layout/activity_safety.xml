@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"
         android:layout_marginTop="30dp"
-        android:text="@string/btn_safety"
+        android:text="@string/title_safety"
         android:textColor="@color/darkBlue"
         android:textSize="30sp"
         android:textStyle="bold"
