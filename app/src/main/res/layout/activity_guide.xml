@@ -6,16 +6,26 @@
     android:layout_height="match_parent"
     tools:context=".Activity.GuideActivity">
 
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/btn_monitor_back"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="30dp"
+        android:src="@drawable/icon_arrow_left"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <com.google.android.material.textview.MaterialTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
+        android:layout_marginStart="61dp"
         android:layout_marginTop="30dp"
         android:text="@string/btn_guide"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textSize="28sp"
+        android:textColor="@color/darkBlue"
+        android:textSize="30sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btn_monitor_back"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.button.MaterialButton

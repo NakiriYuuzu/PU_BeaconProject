@@ -6,15 +6,54 @@
     android:layout_height="match_parent"
     tools:context=".Activity.SafetyActivity">
 
-    <com.google.android.material.textview.MaterialTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/btn_safety_back"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="30dp"
         android:layout_marginTop="30dp"
+        android:src="@drawable/icon_arrow_left"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/materialTextView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="30dp"
         android:text="@string/btn_safety"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textSize="28sp"
+        android:textColor="@color/darkBlue"
+        android:textSize="30sp"
         android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/btn_safety_back"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/btn_safety_trace"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_marginStart="71dp"
+        android:layout_marginTop="160dp"
+        android:layout_marginEnd="72dp"
+        app:lottie_rawRes="@raw/heartbeat"
+        app:lottie_loop="true"
+        app:lottie_autoPlay="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/showDisplay"
+        android:layout_width="350dp"
+        android:layout_height="200dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="532dp"
+        android:layout_marginEnd="30dp"
+        android:text="Information"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.529"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -22,8 +61,8 @@
         android:id="@+id/btn_Receive_Start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="80dp"
-        android:layout_marginTop="400dp"
+        android:layout_marginStart="72dp"
+        android:layout_marginTop="732dp"
         android:text="Start"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -32,22 +71,10 @@
         android:id="@+id/btn_Receive_Stop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="400dp"
-        android:layout_marginEnd="80dp"
+        android:layout_marginTop="732dp"
+        android:layout_marginEnd="84dp"
         android:text="Stop"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/showDisplay"
-        android:layout_width="350dp"
-        android:layout_height="200dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="200dp"
-        android:layout_marginEnd="30dp"
-        android:text="Information"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

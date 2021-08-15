@@ -28,8 +28,6 @@ public class LoginActivity extends AppCompatActivity {
 
         btnLogin.setOnClickListener(v -> loginFunction());
 
-        btnClear.setOnClickListener(v -> clearFunction());
-
         btnRegister.setOnClickListener(v -> guestFunction());
     }
 
@@ -37,8 +35,7 @@ public class LoginActivity extends AppCompatActivity {
         etAcc = findViewById(R.id.etAcc);
         etPass = findViewById(R.id.etPass);
         btnLogin = findViewById(R.id.btnLogin);
-        btnClear = findViewById(R.id.btnClear);
-        btnRegister = findViewById(R.id.btn_Register);
+        btnRegister = findViewById(R.id.btn_Guest);
     }
 
     private void loginFunction() {

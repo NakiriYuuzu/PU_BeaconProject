@@ -7,15 +7,67 @@
     android:layout_height="match_parent"
     tools:context=".Activity.LoginActivity">
 
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="50dp"
+        app:cardElevation="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/shapeableImageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginStart="00dp"
+            android:src="@drawable/logo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/materialTextView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="120dp"
+            android:layout_marginTop="10dp"
+            android:text="@string/app_SchoolName"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/darkBlue"
+            android:textFontWeight="600"
+            android:textSize="30sp"
+            app:fontFamily="@font/noto_sans"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/shapeableImageView"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="120dp"
+            android:layout_marginTop="55dp"
+            android:fontFamily="@font/noto_sans"
+            android:text="@string/app_Title"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/darkBlue"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/shapeableImageView"
+            app:layout_constraintTop_toBottomOf="@+id/materialTextView3" />
+    </com.google.android.material.card.MaterialCardView>
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/outlinedTextField_Account"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_marginStart="31dp"
+        android:layout_marginStart="30dp"
         android:layout_marginTop="200dp"
-        android:layout_marginEnd="31dp"
+        android:layout_marginEnd="30dp"
         android:hint="@string/text_Account"
         app:boxCornerRadiusBottomEnd="15dp"
         app:boxCornerRadiusBottomStart="15dp"
@@ -31,6 +83,7 @@
             android:id="@+id/etAcc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/noto_sans"
             android:textSize="16sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -41,9 +94,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_marginStart="31dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="31dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="30dp"
         android:hint="@string/text_Password"
         app:boxCornerRadiusBottomEnd="15dp"
         app:boxCornerRadiusBottomStart="15dp"
@@ -60,70 +113,59 @@
             android:id="@+id/etPass"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/noto_sans"
             android:inputType="textPassword"
             android:textSize="16sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <CheckBox
+        android:id="@+id/checkBox"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:checked="true"
+        android:fontFamily="@font/noto_sans"
+        android:text="@string/toggle_RememberMe"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/outlinedTextField_Pass" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLogin"
         style="@style/Widget.MaterialComponents.Button"
-        android:layout_width="140dp"
+        android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginStart="31dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="30dp"
+        android:fontFamily="@font/noto_sans"
         android:text="@string/btn_Login"
         android:textSize="16sp"
-        app:cornerRadius="15dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/outlinedTextField_Pass" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnClear"
-        style="@style/Widget.MaterialComponents.Button"
-        android:layout_width="140dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center_vertical"
-        android:layout_marginStart="31dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="31dp"
-        android:layoutDirection="rtl"
-        android:text="@string/btn_Clear"
-        android:textSize="16sp"
-        app:cornerRadius="15dp"
+        app:cornerRadius="20dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/outlinedTextField_Pass" />
+        app:layout_constraintTop_toBottomOf="@+id/checkBox" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_Register"
+        android:id="@+id/btn_Guest"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="31dp"
-        android:layout_marginTop="104dp"
-        android:layout_marginEnd="31dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="30dp"
+        android:fontFamily="@font/noto_sans"
         android:text="@string/btn_Guest"
         android:textSize="16sp"
-        app:cornerRadius="15dp"
+        app:backgroundTint="@color/w"
+        app:cornerRadius="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/outlinedTextField_Pass" />
+        app:layout_constraintTop_toBottomOf="@+id/btnLogin"
+        app:strokeWidth="0dp" />
 
-    <com.google.android.material.textview.MaterialTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="31dp"
-        android:layout_marginTop="31dp"
-        android:text="@string/btn_Login"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

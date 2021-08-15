@@ -29,13 +29,16 @@ import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 public class SafetyActivity extends AppCompatActivity implements BeaconConsumer {
 
     private final String TAG = "SafetyActivity: ";
+
+    //UUID
     private final String IPHONE_UUID = "594650a2-8621-401f-b5de-6eb3ee398170";
     private final String IBEACON_UUID = "699ebc80-e1f3-11e3-9a0f-0cf3ee3bc012";
 
-    private static final long DEFAULT_FOREGROUND_SCAN_PERIOD = 500L; // half sec
-    private static final long DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD = 500L; // half sec
+    private static final long DEFAULT_FOREGROUND_SCAN_PERIOD = 1000L; // half sec
+    private static final long DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD = 1000L; // half sec
 
-    private final float DISTANCE_THRESHOLD = 3.5f;
+    private final double DISTANCE_THRESHOLD = 3.5f;
+    private final double DISTANCE_THRESHOLD_TEST = 0.5f;
 
     private BeaconManager beaconManager;
     private BeaconDefine beaconDefine;
@@ -130,26 +133,6 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
                         Log.e("Debug02", str);
                         Log.e("Debug03", location);
 
-                        if (location.equals(BeaconDefine.IBEACON_21)) {
-                            beaconManager.unbind(SafetyActivity.this);
-                            beaconManager.removeAllRangeNotifiers();
-                            new AlertDialog.Builder(SafetyActivity.this)
-                                    .setTitle("Welcome To Providence University!")
-                                    .setMessage("Location: 主顧樓\n")
-                                    .setPositiveButton("Ok", null)
-                                    .show();
-                        }
-
-                        if (location.equals(BeaconDefine.IBEACON_10)) {
-                            beaconManager.unbind(SafetyActivity.this);
-                            beaconManager.removeAllRangeNotifiers();
-                            new AlertDialog.Builder(SafetyActivity.this)
-                                    .setTitle("Welcome To Providence University!")
-                                    .setMessage("Location: 主顧聖母堂\n")
-                                    .setPositiveButton("Ok", null)
-                                    .show();
-                        }
-
                         updateTextViewMsg(location);
                     }
                 }
@@ -158,7 +141,7 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
         });
 
         try {
-            beaconManager.startRangingBeacons(new Region(IPHONE_UUID, null, null, null));
+            beaconManager.startRangingBeacons(new Region("Beacon_Device", null, null, null));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -175,10 +158,17 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
 
     }
 
+    private void alertFunction(String msg) {
+        new AlertDialog.Builder(this)
+                .setTitle("Welcome to Providence University!")
+                .setMessage("Location: " + msg)
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         beaconManager.unbind(this);
     }
-
 }

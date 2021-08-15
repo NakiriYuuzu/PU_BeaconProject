@@ -14,14 +14,16 @@ import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.permissionx.guolindev.PermissionX;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 
 public class Police_MainActivity extends AppCompatActivity {
 
-    private LottieAnimationView btnMonitor, btnGuide, btnSafety, btnCheck;
-    private MaterialButton btnSignOut;
+    private MaterialCardView btnMonitor, btnGuide, btnSafety, btnCheck;
+    private ShapeableImageView btnSignOut;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,13 +34,15 @@ public class Police_MainActivity extends AppCompatActivity {
         initView();
         requestPermission();
         requestBluetooth();
+
+
     }
 
     private void findView() {
-        btnMonitor = findViewById(R.id.lottieMonitor);
-        btnGuide = findViewById(R.id.lottieGuide);
-        btnSafety = findViewById(R.id.lottieSafety);
-        btnCheck = findViewById(R.id.lottieCheck);
+        btnMonitor = findViewById(R.id.btn_monitor);
+        btnGuide = findViewById(R.id.btn_Guide);
+        btnSafety = findViewById(R.id.btn_safety);
+        btnCheck = findViewById(R.id.btn_check);
         btnSignOut = findViewById(R.id.btn_SignOut);
     }
 

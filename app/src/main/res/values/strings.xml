@@ -1,10 +1,16 @@
 <resources>
     <string name="app_name">Pu_Smart_Campus_Micro-Positioning_Service</string>
-    <string name="app_Title">智慧校園微定位</string>
+    <string name="app_SchoolName">靜宜大學</string>
+    <string name="app_Title">智慧校園微定位服務</string>
 
     <string name="text_Account">賬號</string>
     <string name="text_Password">密碼</string>
     <string name="text_RetypePassword">重新輸入</string>
+    <string name="text_hello">您好: </string>
+
+    <string name="toggle_RememberMe">記住我</string>
+
+    <string name="title_Main">主頁面</string>
 
     <string name="btn_Login">登入</string>
     <string name="btn_Clear">清除</string>
@@ -14,7 +20,7 @@
     <string name="btn_Conform">確定</string>
 
     <string name="btn_monitor">監控畫面</string>
-    <string name="btn_guide">導覽功能</string>
+    <string name="btn_guide">景點導覽</string>
     <string name="btn_safety">安全通道</string>
     <string name="btn_check">人流查詢</string>
 </resources>
