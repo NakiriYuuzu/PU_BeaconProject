@@ -7,16 +7,11 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
-import android.net.Uri;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.ListView;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
@@ -25,11 +20,9 @@ import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
-import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -101,22 +94,32 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
         // 主顧聖母堂
         String pu_chapel_name = getResources().getString(R.string.Providence_Chapel);
         String pu_chapel_info = getResources().getString(R.string.Providence_Chapel_Info);
-        String pu_chapel_url = getResources().getString(R.string.Spot_Link);
+        String pu_chapel_url = getResources().getString(R.string.Providence_Chapel_Link);
+        //byte[] pu_chapel_img = getBytes(BitmapFactory.decodeResource(getResources(), R.drawable.Providence_Chapel_Image));
 
         // 主顧樓
         String pu_hall_name = getResources().getString(R.string.Providence_Hall);
         String pu_hall_info = getResources().getString(R.string.Providence_Hall_Info);
-        String pu_hall_url = getResources().getString(R.string.Spot_Link);
+        String pu_hall_url = getResources().getString(R.string.Providence_Hall_Link);
+        //byte[] pu_hall_img = getBytes(BitmapFactory.decodeResource(getResources(), R.drawable.Providence_Chapel_Image));
 
         // 體育館
         String sport_hall_name = getResources().getString(R.string.Sport_Hall);
         String sport_hall_info = getResources().getString(R.string.Sport_hall_Info);
-        String sport_hall_url = getResources().getString(R.string.Spot_Link);
+        String sport_hall_url = getResources().getString(R.string.Sport_Hall_Link);
+        //byte[] sport_hall_img = getBytes(BitmapFactory.decodeResource(getResources(), R.drawable.Providence_Chapel_Image));
 
         // 將資料依序存入資料庫
         DB.insertSpotData(pu_chapel_name, pu_chapel_info, pu_chapel_url);
         DB.insertSpotData(pu_hall_name, pu_hall_info, pu_hall_url);
         DB.insertSpotData(sport_hall_name, sport_hall_info, sport_hall_url);
+    }
+
+    // convert from bitmap to byte array
+    public static byte[] getBytes(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
+        return stream.toByteArray();
     }
 
     private void beaconInit() {
@@ -157,7 +160,7 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
             Intent intent = new Intent();
             intent.setClass(GuideActivity.this, GuideSpotActvity.class);
             Bundle bundle = new Bundle();
-            bundle.putBoolean("spot01",spot01Enter);
+            bundle.putBoolean("spot01", spot01Enter);
             intent.putExtras(bundle);
             startActivity(intent);
         });
@@ -167,7 +170,7 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
             Intent intent = new Intent();
             intent.setClass(GuideActivity.this, GuideSpotActvity.class);
             Bundle bundle = new Bundle();
-            bundle.putBoolean("spot02",spot02Enter);
+            bundle.putBoolean("spot02", spot02Enter);
             intent.putExtras(bundle);
             startActivity(intent);
         });
@@ -177,7 +180,7 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
             Intent intent = new Intent();
             intent.setClass(GuideActivity.this, GuideSpotActvity.class);
             Bundle bundle = new Bundle();
-            bundle.putBoolean("spot03",spot03Enter);
+            bundle.putBoolean("spot03", spot03Enter);
             intent.putExtras(bundle);
             startActivity(intent);
         });

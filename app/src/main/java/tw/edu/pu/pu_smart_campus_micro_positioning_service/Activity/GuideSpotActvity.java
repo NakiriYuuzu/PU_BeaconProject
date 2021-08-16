@@ -30,7 +30,7 @@ public class GuideSpotActvity extends AppCompatActivity {
 
         findView();
         buttonInit();
-        createInformation();
+        //createInformation();
     }
 
     private void createInformation() {
