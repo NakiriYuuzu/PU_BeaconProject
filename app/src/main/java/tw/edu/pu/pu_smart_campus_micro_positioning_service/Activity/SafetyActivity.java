@@ -9,6 +9,8 @@ import android.util.Log;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 
 import org.altbeacon.beacon.Beacon;
@@ -48,8 +50,9 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
     private BeaconDefine beaconDefine;
 
     private MaterialButton btnStart, btnStop;
-    private MaterialTextView tvShowDisplay;
-    private LottieAnimationView btnSafety;
+    private ShapeableImageView btnBack;
+    private MaterialTextView tvShowDisplay, btnSafety;
+    private LottieAnimationView safetyAnimation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,13 +90,22 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
         btnSafety.setOnClickListener(v -> {
             animationFunction();
         });
+
+        btnBack.setOnClickListener(v -> {
+            finish();
+        });
     }
 
     private void initView() {
         tvShowDisplay = findViewById(R.id.showDisplay);
         btnStart = findViewById(R.id.btn_Receive_Start);
         btnStop = findViewById(R.id.btn_Receive_Stop);
+        btnBack = findViewById(R.id.btn_safety_back);
+
         btnSafety = findViewById(R.id.btn_safety_trace);
+        btnSafety.setText(R.string.safety_Start);
+
+        safetyAnimation = findViewById(R.id.safety_Animation);
 
         beaconDefine = new BeaconDefine();
     }
@@ -176,12 +188,14 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
 
     private void animationFunction() {
         if (animationRunning) {
-            btnSafety.setProgress(0);
-            btnSafety.cancelAnimation();
+            safetyAnimation.setProgress(0);
+            safetyAnimation.cancelAnimation();
+            btnSafety.setText(R.string.safety_Start);
             animationRunning = false;
         }
         else {
-            btnSafety.playAnimation();
+            safetyAnimation.playAnimation();
+            btnSafety.setText(R.string.safety_Activate);
             animationRunning = true;
         }
     }

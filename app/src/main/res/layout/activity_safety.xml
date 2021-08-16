@@ -29,21 +29,36 @@
         app:layout_constraintStart_toEndOf="@+id/btn_safety_back"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.airbnb.lottie.LottieAnimationView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/btn_safety_trace"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="200dp"
+        android:paddingTop="55dp"
+        android:text=""
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:textAlignment="center"
+        android:translationZ="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/safety_Animation"
         android:layout_width="match_parent"
         android:layout_height="250dp"
         android:layout_marginStart="71dp"
-        android:layout_marginTop="160dp"
+        android:layout_marginTop="150dp"
         android:layout_marginEnd="71dp"
         android:scaleX="2.5"
         android:scaleY="2.5"
-        app:lottie_rawRes="@raw/heartbeat"
-        app:lottie_loop="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/heartbeat" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/showDisplay"
