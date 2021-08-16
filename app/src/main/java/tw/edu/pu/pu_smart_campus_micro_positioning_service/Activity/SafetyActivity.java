@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 
@@ -40,11 +41,15 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
     private final double DISTANCE_THRESHOLD = 3.5f;
     private final double DISTANCE_THRESHOLD_TEST = 0.5f;
 
+    private boolean beaconRunning = false;
+    private boolean animationRunning = false;
+
     private BeaconManager beaconManager;
     private BeaconDefine beaconDefine;
 
     private MaterialButton btnStart, btnStop;
     private MaterialTextView tvShowDisplay;
+    private LottieAnimationView btnSafety;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,21 +69,23 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
         beaconManager.setForegroundBetweenScanPeriod(DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD);
         beaconManager.setForegroundScanPeriod(DEFAULT_FOREGROUND_SCAN_PERIOD);
 
+        beaconRunning = true;
+
         beaconManager.bind(this);
     }
 
     private void initButton() {
         btnStart.setOnClickListener(v -> {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    initBeacon();
-                }
-            }).start();
+            initBeacon();
         });
 
         btnStop.setOnClickListener(v -> {
+            beaconRunning = false;
             beaconManager.unbind(this);
+        });
+
+        btnSafety.setOnClickListener(v -> {
+            animationFunction();
         });
     }
 
@@ -86,6 +93,7 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
         tvShowDisplay = findViewById(R.id.showDisplay);
         btnStart = findViewById(R.id.btn_Receive_Start);
         btnStop = findViewById(R.id.btn_Receive_Stop);
+        btnSafety = findViewById(R.id.btn_safety_trace);
 
         beaconDefine = new BeaconDefine();
     }
@@ -166,9 +174,23 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
                 .show();
     }
 
+    private void animationFunction() {
+        if (animationRunning) {
+            btnSafety.setProgress(0);
+            btnSafety.cancelAnimation();
+            animationRunning = false;
+        }
+        else {
+            btnSafety.playAnimation();
+            animationRunning = true;
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        beaconManager.unbind(this);
+        if (!beaconRunning) {
+            beaconManager.unbind(this);
+        }
     }
 }
