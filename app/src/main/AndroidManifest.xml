@@ -6,7 +6,13 @@
     Add this on activity for doInBackground
     android:launchMode="singleInstance"
     -->
+
+    <!--Internet-->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--Bluetooth-->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
@@ -14,8 +20,10 @@
         android:name="android.hardware.bluetooth_le"
         android:required="true" />
 
+    <!--GPS-->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application

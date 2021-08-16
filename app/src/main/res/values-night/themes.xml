@@ -14,6 +14,5 @@
         <!-- Customize your theme here. -->
         <item name="android:fontFamily">@font/noto_sans</item>
         <item name="android:textViewStyle">@color/darkBlue</item>
-        <item name="cardBackgroundColor">@color/lightBlue</item>
     </style>
 </resources>
