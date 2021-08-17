@@ -24,14 +24,17 @@ public class BeaconDefine {
         Map<String, String> ibeacon_11_Location = new HashMap<>();
         Map<String, String> ibeacon_21_Location = new HashMap<>();
 
+        // Minor
         iphoneLocation.put("87", POINT_01);
         iphoneLocation.put("89", POINT_02);
         iphoneLocation.put("99", POINT_03);
 
+        // Minor
         ibeacon_10_Location.put("1221", IBEACON_10);
         ibeacon_11_Location.put("1231", IBEACON_11);
         ibeacon_21_Location.put("11365", IBEACON_21);
 
+        // Major
         locations.put("94", iphoneLocation);
         locations.put("122", ibeacon_10_Location);
         locations.put("123", ibeacon_11_Location);

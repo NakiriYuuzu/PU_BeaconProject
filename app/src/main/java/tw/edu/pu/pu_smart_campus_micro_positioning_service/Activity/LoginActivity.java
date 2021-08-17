@@ -2,8 +2,11 @@ package tw.edu.pu.pu_smart_campus_micro_positioning_service.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.widget.Toast;
 
 import com.google.android.material.button.MaterialButton;
@@ -14,21 +17,39 @@ import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 
 public class LoginActivity extends AppCompatActivity {
 
-    TextInputEditText etAcc, etPass;
-    MaterialButton btnLogin, btnClear, btnRegister;
-    DBHelper db;
+    private TextInputEditText etAcc, etPass;
+    private MaterialButton btnLogin, btnRegister;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        findView();
-        db = new DBHelper(this);
+        if (!isNetworkConnected()) {
+            Toast.makeText(getApplicationContext(), "請打開網絡後，再打開APP.", Toast.LENGTH_SHORT).show();
 
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    finish();
+                }
+            }, 3000);
+
+        }
+        else {
+            findView();
+            buttonInit();
+        }
+    }
+
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
+    }
+
+    private void buttonInit() {
         btnLogin.setOnClickListener(v -> loginFunction());
-
-        btnClear.setOnClickListener(v -> clearFunction());
 
         btnRegister.setOnClickListener(v -> guestFunction());
     }
@@ -37,8 +58,7 @@ public class LoginActivity extends AppCompatActivity {
         etAcc = findViewById(R.id.etAcc);
         etPass = findViewById(R.id.etPass);
         btnLogin = findViewById(R.id.btnLogin);
-        btnClear = findViewById(R.id.btnClear);
-        btnRegister = findViewById(R.id.btn_Register);
+        btnRegister = findViewById(R.id.btn_Guest);
     }
 
     private void loginFunction() {

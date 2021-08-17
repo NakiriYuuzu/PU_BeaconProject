@@ -1,18 +1,21 @@
 package tw.edu.pu.pu_smart_campus_micro_positioning_service.Activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.sqlite.SQLiteException;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 
+import com.airbnb.lottie.L;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 
@@ -22,8 +25,6 @@ import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
-
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,7 +38,7 @@ import tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconDefine;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Database.DBHelper;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 
-public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
+public class GuideActivity extends AppCompatActivity implements BeaconConsumer, OnMapReadyCallback {
 
     private final String TAG = "SafetyActivity: ";
     private final String IPHONE_ID = "594650a2-8621-401f-b5de-6eb3ee398170";
@@ -54,6 +55,8 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
     private boolean spot01Enter = false;
     private boolean spot02Enter = false;
     private boolean spot03Enter = false;
+
+    private GoogleMap gMap;
 
     private BeaconManager beaconManager;
     private BeaconDefine beaconDefine;
@@ -95,31 +98,21 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
         String pu_chapel_name = getResources().getString(R.string.Providence_Chapel);
         String pu_chapel_info = getResources().getString(R.string.Providence_Chapel_Info);
         String pu_chapel_url = getResources().getString(R.string.Providence_Chapel_Link);
-        //byte[] pu_chapel_img = getBytes(BitmapFactory.decodeResource(getResources(), R.drawable.Providence_Chapel_Image));
 
         // 主顧樓
         String pu_hall_name = getResources().getString(R.string.Providence_Hall);
         String pu_hall_info = getResources().getString(R.string.Providence_Hall_Info);
         String pu_hall_url = getResources().getString(R.string.Providence_Hall_Link);
-        //byte[] pu_hall_img = getBytes(BitmapFactory.decodeResource(getResources(), R.drawable.Providence_Chapel_Image));
 
         // 體育館
         String sport_hall_name = getResources().getString(R.string.Sport_Hall);
         String sport_hall_info = getResources().getString(R.string.Sport_hall_Info);
         String sport_hall_url = getResources().getString(R.string.Sport_Hall_Link);
-        //byte[] sport_hall_img = getBytes(BitmapFactory.decodeResource(getResources(), R.drawable.Providence_Chapel_Image));
 
         // 將資料依序存入資料庫
         DB.insertSpotData(pu_chapel_name, pu_chapel_info, pu_chapel_url);
         DB.insertSpotData(pu_hall_name, pu_hall_info, pu_hall_url);
         DB.insertSpotData(sport_hall_name, sport_hall_info, sport_hall_url);
-    }
-
-    // convert from bitmap to byte array
-    public static byte[] getBytes(Bitmap bitmap) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
-        return stream.toByteArray();
     }
 
     private void beaconInit() {
@@ -158,7 +151,7 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
         btn_spot01.setOnClickListener(v -> {
             spot01Enter = true;
             Intent intent = new Intent();
-            intent.setClass(GuideActivity.this, GuideSpotActvity.class);
+            intent.setClass(GuideActivity.this, GuideSpotActivity.class);
             Bundle bundle = new Bundle();
             bundle.putBoolean("spot01", spot01Enter);
             intent.putExtras(bundle);
@@ -168,7 +161,7 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
         btn_spot02.setOnClickListener(v -> {
             spot02Enter = true;
             Intent intent = new Intent();
-            intent.setClass(GuideActivity.this, GuideSpotActvity.class);
+            intent.setClass(GuideActivity.this, GuideSpotActivity.class);
             Bundle bundle = new Bundle();
             bundle.putBoolean("spot02", spot02Enter);
             intent.putExtras(bundle);
@@ -178,7 +171,7 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
         btn_spot03.setOnClickListener(v -> {
             spot03Enter = true;
             Intent intent = new Intent();
-            intent.setClass(GuideActivity.this, GuideSpotActvity.class);
+            intent.setClass(GuideActivity.this, GuideSpotActivity.class);
             Bundle bundle = new Bundle();
             bundle.putBoolean("spot03", spot03Enter);
             intent.putExtras(bundle);
@@ -197,6 +190,10 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
         btn_spot03 = findViewById(R.id.btn03);
 
         beaconDefine = new BeaconDefine();
+
+        // Google Map View
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView);
+        mapFragment.getMapAsync(this);
     }
 
     @Override
@@ -287,5 +284,15 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer {
 
             beaconIsRunning = false;
         }
+    }
+
+    @Override
+    public void onMapReady(@NonNull GoogleMap googleMap) {
+        gMap = googleMap;
+
+        // Adding Marker
+        LatLng pu = new LatLng(24.22619425510969, 120.57723631404022);
+        gMap.addMarker(new MarkerOptions().position(pu).title("Marker at pu"));
+        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pu,16));
     }
 }

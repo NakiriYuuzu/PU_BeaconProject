@@ -2,7 +2,7 @@
 
 <resources>
 
-    /* ------------------------------------------------ */
+    /* --------------------------------------------------------------------------------------- */
 
     <string name="Providence_Chapel">主顧聖母堂</string>
     <drawable name="Providence_Chapel_Image">@drawable/providence_chapel</drawable>
@@ -15,7 +15,7 @@
         "https://www.pu.edu.tw/p/406-1000-1131,r192.php?Lang=zh-tw"
     </string>
 
-    /* ------------------------------------------------ */
+    /* --------------------------------------------------------------------------------------- */
 
     <string name="Providence_Hall">主顧樓</string>
     <drawable name="Providence_Hall_Image">@drawable/providence_hall</drawable>
@@ -30,7 +30,7 @@
         "https://www.pu.edu.tw/p/406-1000-1131,r192.php?Lang=zh-tw"
     </string>
 
-    /* ------------------------------------------------ */
+    /* --------------------------------------------------------------------------------------- */
 
     <string name="Sport_Hall">若望保祿二世體育館</string>
     <drawable name="Sport_Hall_Image">@drawable/sport_hall</drawable>

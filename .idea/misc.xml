@@ -3,20 +3,28 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidStudio/Pu_Smart_Campus_MicroPositioning_Service/app/src/main/res/drawable/ic_baseline_account_circle_24.xml" value="0.31981981981981983" />
+        <entry key="..\:/AndroidStudio/Pu_Smart_Campus_MicroPositioning_Service/app/src/main/res/drawable/ic_baseline_map_24.xml" value="0.31981981981981983" />
+        <entry key="..\:/AndroidStudio/Pu_Smart_Campus_MicroPositioning_Service/app/src/main/res/drawable/icon_arrow_right.xml" value="0.31981981981981983" />
         <entry key="..\:/AndroidStudio/Pu_Smart_Campus_MicroPositioning_Service/app/src/main/res/layout/activity_check.xml" value="0.30405405405405406" />
-        <entry key="..\:/AndroidStudio/Pu_Smart_Campus_MicroPositioning_Service/app/src/main/res/layout/activity_guide.xml" value="0.36614583333333334" />
+        <entry key="..\:/AndroidStudio/Pu_Smart_Campus_MicroPositioning_Service/app/src/main/res/layout/activity_guide.xml" value="0.33" />
+        <entry key="..\:/AndroidStudio/Pu_Smart_Campus_MicroPositioning_Service/app/src/main/res/layout/activity_guide_spot.xml" value="0.30585585585585584" />
         <entry key="..\:/AndroidStudio/Pu_Smart_Campus_MicroPositioning_Service/app/src/main/res/layout/activity_login.xml" value="0.31666666666666665" />
         <entry key="..\:/AndroidStudio/Pu_Smart_Campus_MicroPositioning_Service/app/src/main/res/layout/activity_main_police.xml" value="0.33" />
         <entry key="..\:/AndroidStudio/Pu_Smart_Campus_MicroPositioning_Service/app/src/main/res/layout/activity_monitor.xml" value="0.31666666666666665" />
         <entry key="..\:/AndroidStudio/Pu_Smart_Campus_MicroPositioning_Service/app/src/main/res/layout/activity_safety.xml" value="0.31666666666666665" />
+        <entry key="..\:/AndroidStudio/Pu_Smart_Campus_MicroPositioning_Service/app/src/main/res/layout/check_detail.xml" value="0.30585585585585584" />
+        <entry key="..\:/AndroidStudio/Pu_Smart_Campus_MicroPositioning_Service/app/src/main/res/layout/fragment_check__chart.xml" value="0.30585585585585584" />
+        <entry key="..\:/AndroidStudio/Pu_Smart_Campus_MicroPositioning_Service/app/src/main/res/layout/fragment_check__recycle_view.xml" value="0.30585585585585584" />
         <entry key="..\:/Users/Asus/Downloads/PU_BeaconProject/app/src/main/res/layout/activity_check.xml" value="0.3875" />
-        <entry key="..\:/Users/Asus/Downloads/PU_BeaconProject/app/src/main/res/layout/activity_guide.xml" value="0.3875" />
+        <entry key="..\:/Users/Asus/Downloads/PU_BeaconProject/app/src/main/res/layout/activity_guide.xml" value="0.34814814814814815" />
         <entry key="..\:/Users/Asus/Downloads/PU_BeaconProject/app/src/main/res/layout/activity_guide_spot.xml" value="0.33" />
         <entry key="..\:/Users/Asus/Downloads/PU_BeaconProject/app/src/main/res/layout/activity_guidespot.xml" value="0.3875" />
         <entry key="..\:/Users/Asus/Downloads/PU_BeaconProject/app/src/main/res/layout/activity_login.xml" value="0.3875" />
         <entry key="..\:/Users/Asus/Downloads/PU_BeaconProject/app/src/main/res/layout/activity_main_police.xml" value="0.3875" />
         <entry key="..\:/Users/Asus/Downloads/PU_BeaconProject/app/src/main/res/layout/activity_monitor.xml" value="0.3875" />
         <entry key="..\:/Users/Asus/Downloads/PU_BeaconProject/app/src/main/res/layout/activity_safety.xml" value="0.3875" />
+        <entry key="..\:/Users/Asus/Downloads/PU_BeaconProject/app/src/main/res/layout/fragment_check__recycle_view.xml" value="0.3875" />
         <entry key="..\:/Users/Asus/Downloads/PU_BeaconProject/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.4036458333333333" />
         <entry key="..\:/Users/Asus/Downloads/PU_BeaconProject/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.4036458333333333" />
       </map>

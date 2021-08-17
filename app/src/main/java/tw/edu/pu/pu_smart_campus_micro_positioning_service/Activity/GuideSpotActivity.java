@@ -5,21 +5,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.Button;
-import android.widget.ImageView;
-
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Database.DBHelper;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 
-public class GuideSpotActvity extends AppCompatActivity {
+public class GuideSpotActivity extends AppCompatActivity {
 
 
     private MaterialTextView tvName, tvGuideInfo;
-    private ImageView ivSpotImage;
-    private Button btnUrl, btnBack;
+    private ShapeableImageView btnBack, ivSpotImage;
+    private MaterialButton btnUrl;
 
     private DBHelper DB;
 
@@ -35,8 +33,8 @@ public class GuideSpotActvity extends AppCompatActivity {
 
     private void createInformation() {
         DB = new DBHelper(this);
-        String arr[] = new String[3];
-        String finalArr[];
+        String [] arr = new String[3];
+        String [] finalArr;
 
         Bundle bundle = getIntent().getExtras();
         if (bundle.getBoolean("spot01")) {
@@ -98,7 +96,7 @@ public class GuideSpotActvity extends AppCompatActivity {
         tvName = findViewById(R.id.tvName);
         ivSpotImage = findViewById(R.id.ivSpotImage);
         btnUrl = findViewById(R.id.btnUrl);
-        btnBack = findViewById(R.id.btnBack);
+        btnBack = findViewById(R.id.btn_check_back);
         tvGuideInfo = findViewById(R.id.tvGuideInfo);
     }
 

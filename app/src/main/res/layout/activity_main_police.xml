@@ -6,122 +6,292 @@
     android:layout_height="match_parent"
     tools:context=".Activity.Police_MainActivity">
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottieMonitor"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/shapeableImageView2"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_marginStart="30dp"
-        android:layout_marginTop="120dp"
+        android:layout_marginTop="30dp"
+        android:src="@drawable/icon_account"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:lottie_autoPlay="true"
-        app:lottie_loop="true"
-        app:lottie_rawRes="@raw/monitor"/>
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/btn_SignOut"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="30dp"
+        android:src="@drawable/icon_signout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/materialTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="68dp"
-        android:text="@string/btn_monitor"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginStart="71dp"
+        android:layout_marginTop="35dp"
+        android:layout_marginEnd="70dp"
+        android:text="@string/title_Main"
+        android:textColor="@color/darkBlue"
+        android:textSize="30sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lottieMonitor" />
-
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottieGuide"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_marginTop="120dp"
-        android:layout_marginEnd="30dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:lottie_autoPlay="true"
-        app:lottie_loop="true"
-        app:lottie_rawRes="@raw/guide"/>
+        app:layout_constraintEnd_toStartOf="@+id/btn_SignOut"
+        app:layout_constraintStart_toEndOf="@+id/shapeableImageView2"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/materialTextView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="68dp"
-        android:text="@string/btn_guide"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lottieGuide" />
-
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottieSafety"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
         android:layout_marginStart="30dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
+        android:text="@string/app_Title"
+        android:textColor="@color/darkBlue"
+        android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/materialTextView"
-        app:lottie_autoPlay="true"
-        app:lottie_loop="true"
-        app:lottie_rawRes="@raw/safety" />
+        app:layout_constraintTop_toBottomOf="@+id/shapeableImageView2" />
 
     <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/materialTextView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="68dp"
-        android:text="@string/btn_safety"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textStyle="bold"
+        android:layout_marginStart="30dp"
+        android:text="@string/text_hello"
+        android:textColor="@color/lightBlue"
+        android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lottieSafety" />
+        app:layout_constraintTop_toBottomOf="@+id/materialTextView2" />
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottieCheck"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="30dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/materialTextView2"
-        app:lottie_rawRes="@raw/check"
-        app:lottie_autoPlay="true"
-        app:lottie_loop="true"/>
 
     <com.google.android.material.textview.MaterialTextView
-        android:layout_width="wrap_content"
+        android:id="@+id/studentID"
+        android:layout_width="160dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="68dp"
-        android:text="@string/btn_check"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lottieCheck" />
+        android:text=""
+        android:textAlignment="textStart"
+        android:textColor="@color/lightBlue"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@+id/materialTextView4"
+        app:layout_constraintTop_toBottomOf="@+id/materialTextView2" />
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/tvUsername_main"
-        android:layout_width="wrap_content"
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="31dp"
-        android:layout_marginTop="28dp"
-        android:text="@string/text_Account"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textSize="30sp"
-        android:textStyle="bold"
+        android:paddingTop="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/studentID"
+        app:layout_constraintVertical_bias="0.0">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_SignOut"
-        android:layout_width="140dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="600dp"
-        android:layout_marginEnd="31dp"
-        android:text="@string/btn_SignOut"
-        app:cornerRadius="15dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.567"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btn_Guide"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
+                app:cardBackgroundColor="@color/lightBlue"
+                app:cardCornerRadius="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="15dp"
+                    app:cardBackgroundColor="@color/lightBlue"
+                    app:cardCornerRadius="15dp"
+                    app:strokeWidth="2dp">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:src="@drawable/icon_guide" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="140dp"
+                    android:layout_marginTop="36dp"
+                    android:text="@string/title_guide"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="280dp"
+                    android:layout_marginTop="36dp"
+                    android:src="@drawable/icon_arrow_right" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btn_check"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="30dp"
+                app:cardBackgroundColor="@color/lightBlue"
+                app:cardCornerRadius="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btn_Guide">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="15dp"
+                    app:cardBackgroundColor="@color/lightBlue"
+                    app:cardCornerRadius="15dp"
+                    app:strokeWidth="2dp">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:src="@drawable/icon_check" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="140dp"
+                    android:layout_marginTop="36dp"
+                    android:text="@string/title_check"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="280dp"
+                    android:layout_marginTop="36dp"
+                    android:src="@drawable/icon_arrow_right" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btn_safety"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="30dp"
+                app:cardBackgroundColor="@color/lightBlue"
+                app:cardCornerRadius="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btn_check">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="15dp"
+                    app:cardBackgroundColor="@color/lightBlue"
+                    app:cardCornerRadius="15dp"
+                    app:strokeWidth="2dp">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:src="@drawable/icon_safety" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="140dp"
+                    android:layout_marginTop="36dp"
+                    android:text="@string/title_safety"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="280dp"
+                    android:layout_marginTop="36dp"
+                    android:src="@drawable/icon_arrow_right" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btn_monitor"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="30dp"
+                app:cardBackgroundColor="@color/lightBlue"
+                app:cardCornerRadius="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btn_safety">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="15dp"
+                    app:cardBackgroundColor="@color/lightBlue"
+                    app:cardCornerRadius="15dp"
+                    app:strokeWidth="2dp">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:src="@drawable/icon_monitor" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="140dp"
+                    android:layout_marginTop="36dp"
+                    android:text="@string/title_monitor"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="280dp"
+                    android:layout_marginTop="36dp"
+                    android:src="@drawable/icon_arrow_right" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
