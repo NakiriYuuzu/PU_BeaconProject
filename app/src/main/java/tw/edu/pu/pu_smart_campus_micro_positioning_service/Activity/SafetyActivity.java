@@ -203,7 +203,7 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (!beaconRunning) {
+        if (beaconRunning) {
             beaconManager.unbind(this);
         }
     }

@@ -61,7 +61,8 @@ public class Police_MainActivity extends AppCompatActivity {
         });
 
         btnCheck.setOnClickListener(v -> {
-
+            Intent ii = new Intent(getApplicationContext(), CheckActivity.class);
+            startActivity(ii);
         });
 
         btnSignOut.setOnClickListener(v -> finish());
