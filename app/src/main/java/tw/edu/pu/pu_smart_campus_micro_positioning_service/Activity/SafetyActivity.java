@@ -7,7 +7,10 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 
 import org.altbeacon.beacon.Beacon;
@@ -40,11 +43,16 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
     private final double DISTANCE_THRESHOLD = 3.5f;
     private final double DISTANCE_THRESHOLD_TEST = 0.5f;
 
+    private boolean beaconRunning = false;
+    private boolean animationRunning = false;
+
     private BeaconManager beaconManager;
     private BeaconDefine beaconDefine;
 
     private MaterialButton btnStart, btnStop;
-    private MaterialTextView tvShowDisplay;
+    private ShapeableImageView btnBack;
+    private MaterialTextView tvShowDisplay, btnSafety;
+    private LottieAnimationView safetyAnimation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,21 +72,27 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
         beaconManager.setForegroundBetweenScanPeriod(DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD);
         beaconManager.setForegroundScanPeriod(DEFAULT_FOREGROUND_SCAN_PERIOD);
 
+        beaconRunning = true;
+
         beaconManager.bind(this);
     }
 
     private void initButton() {
         btnStart.setOnClickListener(v -> {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    initBeacon();
-                }
-            }).start();
+            initBeacon();
         });
 
         btnStop.setOnClickListener(v -> {
+            beaconRunning = false;
             beaconManager.unbind(this);
+        });
+
+        btnSafety.setOnClickListener(v -> {
+            animationFunction();
+        });
+
+        btnBack.setOnClickListener(v -> {
+            finish();
         });
     }
 
@@ -86,6 +100,12 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
         tvShowDisplay = findViewById(R.id.showDisplay);
         btnStart = findViewById(R.id.btn_Receive_Start);
         btnStop = findViewById(R.id.btn_Receive_Stop);
+        btnBack = findViewById(R.id.btn_safety_back);
+
+        btnSafety = findViewById(R.id.btn_safety_trace);
+        btnSafety.setText(R.string.safety_Start);
+
+        safetyAnimation = findViewById(R.id.safety_Animation);
 
         beaconDefine = new BeaconDefine();
     }
@@ -166,9 +186,25 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
                 .show();
     }
 
+    private void animationFunction() {
+        if (animationRunning) {
+            safetyAnimation.setProgress(0);
+            safetyAnimation.cancelAnimation();
+            btnSafety.setText(R.string.safety_Start);
+            animationRunning = false;
+        }
+        else {
+            safetyAnimation.playAnimation();
+            btnSafety.setText(R.string.safety_Activate);
+            animationRunning = true;
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        beaconManager.unbind(this);
+        if (beaconRunning) {
+            beaconManager.unbind(this);
+        }
     }
 }

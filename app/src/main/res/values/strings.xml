@@ -16,9 +16,14 @@
     <string name="title_monitor">監控畫面</string>
     <string name="title_guide_spot">詳細景點</string>
     <string name="title_guide">景點導覽</string>
-    <string name="title_safety">安全通道</string>
     <string name="title_check">人流查詢</string>
 
+    <!--Activity safety-->
+    <string name="title_safety">安全通道</string>
+    <string name="safety_Start">安全導覽</string>
+    <string name="safety_Activate">監控中</string>
+
+    <!--Button Name-->
     <string name="btn_Login">登入</string>
     <string name="btn_Clear">清除</string>
     <string name="btn_SignOut">登出</string>
@@ -26,6 +31,7 @@
     <string name="btn_Cancel">取消</string>
     <string name="btn_Conform">確定</string>
     <string name="btn_findMore">查看更多</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
