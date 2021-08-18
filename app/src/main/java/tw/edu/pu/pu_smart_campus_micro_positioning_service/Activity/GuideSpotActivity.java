@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
@@ -19,8 +20,6 @@ public class GuideSpotActivity extends AppCompatActivity {
     private ShapeableImageView btnBack, ivSpotImage;
     private MaterialButton btnUrl;
 
-    private DBHelper DB;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,64 +27,59 @@ public class GuideSpotActivity extends AppCompatActivity {
 
         findView();
         buttonInit();
-        //createInformation();
+        createInformation();
     }
 
     private void createInformation() {
-        DB = new DBHelper(this);
-        String [] arr = new String[3];
-        String [] finalArr;
+        DBHelper DB = new DBHelper(this);
+        String [] spotData;
 
         Bundle bundle = getIntent().getExtras();
+
         if (bundle.getBoolean("spot01")) {
 
-            arr = DB.fetchSpotData("主顧聖母堂");
+            spotData = DB.fetchSpotData("主顧聖母堂");
+            if(spotData.length > 0){
 
-            if (arr.length > 0) {
-
-                tvName.setText(arr[0]);
-                tvGuideInfo.setText(arr[1]);
+                tvName.setText(spotData[0]);
+                tvGuideInfo.setText(spotData[1]);
                 ivSpotImage.setImageResource(R.drawable.providence_chapel);
 
-                finalArr = arr;
                 btnUrl.setOnClickListener(v -> {
-                    Uri uri = Uri.parse(finalArr[2]);
-                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    Uri uri = Uri.parse(spotData[2]);
+                    Intent intent = new Intent(Intent.ACTION_VIEW,uri);
                     startActivity(intent);
                 });
             }
+        }
+        else if (bundle.getBoolean("spot02")) {
 
-        } else if (bundle.getBoolean("spot02")) {
+            spotData = DB.fetchSpotData("主顧樓");
+            if(spotData.length > 0){
 
-            arr = DB.fetchSpotData("主顧樓");
+                tvName.setText(spotData[0]);
+                tvGuideInfo.setText(spotData[1]);
+                ivSpotImage.setImageResource(R.drawable.providence_chapel);
 
-            if (arr.length > 0) {
-
-                tvName.setText(arr[0]);
-                tvGuideInfo.setText(arr[1]);
-                ivSpotImage.setImageResource(R.drawable.providence_hall);
-
-                finalArr = arr;
                 btnUrl.setOnClickListener(v -> {
-                    Uri uri = Uri.parse(finalArr[2]);
-                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    Uri uri = Uri.parse(spotData[2]);
+                    Intent intent = new Intent(Intent.ACTION_VIEW,uri);
                     startActivity(intent);
                 });
             }
+        }
+        else if (bundle.getBoolean("spot03")) {
 
-        } else if (bundle.getBoolean("spot03")) {
-            arr = DB.fetchSpotData("若望保祿二世體育館");
+            spotData = DB.fetchSpotData("體育館");
+            if(spotData.length > 0){
 
-            if (arr.length > 0) {
+                tvName.setText(spotData[0]);
+                tvGuideInfo.setText(spotData[1]);
+                ivSpotImage.setImageResource(R.drawable.providence_chapel);
 
-                tvName.setText(arr[0]);
-                tvGuideInfo.setText(arr[1]);
-                ivSpotImage.setImageResource(R.drawable.sport_hall);
-
-                finalArr = arr;
                 btnUrl.setOnClickListener(v -> {
-                    Uri uri = Uri.parse(finalArr[2]);
-                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    Uri uri = Uri.parse(spotData[2]);
+                    Intent intent = new Intent(Intent.ACTION_VIEW,uri);
                     startActivity(intent);
                 });
             }
@@ -101,8 +95,6 @@ public class GuideSpotActivity extends AppCompatActivity {
     }
 
     private void buttonInit() {
-        btnBack.setOnClickListener(v -> {
-            finish();
-        });
+        btnBack.setOnClickListener(v -> finish());
     }
 }

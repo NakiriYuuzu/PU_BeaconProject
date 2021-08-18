@@ -34,77 +34,43 @@
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tv_Guide_information"
         android:layout_width="350dp"
-        android:layout_height="100dp"
+        android:layout_height="180dp"
         android:layout_marginStart="30dp"
-        android:layout_marginTop="316dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="30dp"
         android:text="Information"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_Guide_Start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="72dp"
-        android:layout_marginTop="440dp"
-        android:text="Start"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/mapView" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_Guide_Stop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="440dp"
-        android:layout_marginEnd="84dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="76dp"
+        android:layout_marginBottom="30dp"
         android:text="Stop"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/btn02"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="196dp"
-        android:layout_marginBottom="20dp"
-        android:text="主顧樓"
-        app:layout_constraintStart_toEndOf="@+id/btn01"
         app:layout_constraintTop_toBottomOf="@+id/tv_Guide_information" />
 
-    <Button
-        android:id="@+id/btn01"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_Guide_Start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="196dp"
-        android:layout_marginBottom="20dp"
-        android:text="聖母堂"
+        android:layout_marginStart="80dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="30dp"
+        android:text="Start"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_Guide_information" />
-
-    <Button
-        android:id="@+id/btn03"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="196dp"
-        android:layout_marginEnd="40dp"
-        android:layout_marginBottom="20dp"
-        android:text="體育館"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/btn02"
         app:layout_constraintTop_toBottomOf="@+id/tv_Guide_information" />
 
     <fragment
         android:id="@+id/mapView"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="300dp"
         android:layout_marginLeft="30dp"
         android:layout_marginTop="30dp"
         android:layout_marginRight="30dp"
