@@ -16,6 +16,7 @@
         <entry key="..\:/AndroidStudio/Pu_Smart_Campus_MicroPositioning_Service/app/src/main/res/layout/check_detail.xml" value="0.30585585585585584" />
         <entry key="..\:/AndroidStudio/Pu_Smart_Campus_MicroPositioning_Service/app/src/main/res/layout/fragment_check__chart.xml" value="0.30585585585585584" />
         <entry key="..\:/AndroidStudio/Pu_Smart_Campus_MicroPositioning_Service/app/src/main/res/layout/fragment_check__recycle_view.xml" value="0.30585585585585584" />
+        <entry key="..\:/Users/ASUS/OneDrive/Desktop/PU_BeaconProject/app/src/main/res/layout/activity_guide.xml" value="0.2653985507246377" />
         <entry key="..\:/Users/Asus/Downloads/PU_BeaconProject/app/src/main/res/layout/activity_check.xml" value="0.3875" />
         <entry key="..\:/Users/Asus/Downloads/PU_BeaconProject/app/src/main/res/layout/activity_guide.xml" value="0.34814814814814815" />
         <entry key="..\:/Users/Asus/Downloads/PU_BeaconProject/app/src/main/res/layout/activity_guide_spot.xml" value="0.33" />
@@ -30,7 +31,7 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">
