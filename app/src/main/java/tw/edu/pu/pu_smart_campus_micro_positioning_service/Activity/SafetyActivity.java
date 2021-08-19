@@ -1,22 +1,37 @@
 package tw.edu.pu.pu_smart_campus_micro_positioning_service.Activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
+import com.permissionx.guolindev.PermissionX;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
+import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
@@ -33,10 +48,6 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
 
     private final String TAG = "SafetyActivity: ";
 
-    //UUID
-    private final String IPHONE_UUID = "594650a2-8621-401f-b5de-6eb3ee398170";
-    private final String IBEACON_UUID = "699ebc80-e1f3-11e3-9a0f-0cf3ee3bc012";
-
     private static final long DEFAULT_FOREGROUND_SCAN_PERIOD = 1000L; // half sec
     private static final long DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD = 1000L; // half sec
 
@@ -45,6 +56,12 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
 
     private boolean beaconRunning = false;
     private boolean animationRunning = false;
+    private boolean isTimerStarted = false;
+    private volatile boolean stopThread = false;
+
+    private static final long Timer = 10000;
+    private long TimeLeft = Timer;
+    private CountDownTimer countDownTimer;
 
     private BeaconManager beaconManager;
     private BeaconDefine beaconDefine;
@@ -54,13 +71,31 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
     private MaterialTextView tvShowDisplay, btnSafety;
     private LottieAnimationView safetyAnimation;
 
+    private String major;
+    private String minor;
+
+    Handler handler = new Handler(){
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            Bundle bundle = msg.getData();
+            String str = bundle.getString("Key");
+
+            showAlert(str);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_safety);
 
         initView();
+        requestPermission();
+        requestBluetooth();
         initButton();
+        Log.e("isTimerStarted", String.valueOf(isTimerStarted));
+        Log.e("Timer", String.valueOf(TimeLeft));
     }
 
     private void initBeacon() {
@@ -73,22 +108,49 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
         beaconManager.setForegroundScanPeriod(DEFAULT_FOREGROUND_SCAN_PERIOD);
 
         beaconRunning = true;
-
-        beaconManager.bind(this);
     }
 
     private void initButton() {
         btnStart.setOnClickListener(v -> {
             initBeacon();
+            Log.e(TAG, "didRangeBeaconsInRegion: " + major + ", " + minor + ", " + isTimerStarted);
+            if(major == null && minor == null || isTimerStarted == false) {
+                TimerRunInBg timer = new TimerRunInBg();
+                timer.start();
+            }
         });
 
         btnStop.setOnClickListener(v -> {
-            beaconRunning = false;
-            beaconManager.unbind(this);
+            if (beaconRunning) {
+                beaconManager.removeAllRangeNotifiers();
+                beaconRunning = false;
+            }
         });
 
         btnSafety.setOnClickListener(v -> {
-            animationFunction();
+            Log.e(TAG, "initButton: " + animationRunning + ", " + beaconRunning);
+
+            if (animationRunning && beaconRunning) {
+                safetyAnimation.setProgress(0);
+                safetyAnimation.cancelAnimation();
+                btnSafety.setText(R.string.safety_Start);
+                animationRunning = false;
+
+                beaconManager.removeAllRangeNotifiers();
+                beaconRunning = false;
+
+                stopThread = true;
+            }
+            else {
+                safetyAnimation.playAnimation();
+                btnSafety.setText(R.string.safety_Activate);
+                animationRunning = true;
+
+                initBeacon();
+                TimerRunInBg timer = new TimerRunInBg();
+                timer.start();
+                stopThread = false;
+            }
         });
 
         btnBack.setOnClickListener(v -> {
@@ -110,15 +172,60 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
         beaconDefine = new BeaconDefine();
     }
 
+    private void requestPermission() {
+        if (Build.VERSION.SDK_INT > 23) {
+            PermissionX.init(this)
+                    .permissions(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+
+                    .onExplainRequestReason((scope, deniedList) -> scope.showRequestReasonDialog(
+                            deniedList, "Grant Permission!", "Sure", "Cancel"))
+
+                    .request((allGranted, grantedList, deniedList) -> {
+                        if (!allGranted) {
+                            Toast.makeText(getApplicationContext(), "Grant Permission failed!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
+        else {
+            Toast.makeText(getApplicationContext(), "您的手機無法使用該應用...", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
+    }
+
+    private void requestBluetooth() {
+        BluetoothAdapter mBluetoothAdapter;
+
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH)) {
+            Toast.makeText(this, "Bluetooth is not supported!", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            Toast.makeText(this, "ble is not supported!", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
+        final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = bluetoothManager.getAdapter();
+
+        if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
+            Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivity(enableBluetooth);
+        }
+    }
+
     @Override
     public void onBeaconServiceConnect() {
         beaconManager.addRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> collection, Region region) {
                 if (collection.size() > 0) {
+                    stopThread = true;
+
                     List<Beacon> beacons = new ArrayList<>();
                     for (Beacon beacon : collection) {
-                        if (beacon.getId1().toString().equalsIgnoreCase(IPHONE_UUID) || beacon.getId1().toString().equalsIgnoreCase(IBEACON_UUID) && beacon.getDistance() <= 30F) {
+                        if (beacon.getDistance() <= 30) {
                             beacons.add(beacon);
                             Log.e("Debug01", beacon.toString());
                         }
@@ -129,75 +236,74 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
                         Collections.sort(beacons, new Comparator<Beacon>() {
                             public int compare(Beacon arg0, Beacon arg1) {
                                 //Rssi 判斷
-                                return (arg1.getRssi() - arg0.getRssi());
+                                //return (arg1.getRssi() - arg0.getRssi());
 
                                 //Distance 判斷
-                                //return Double.compare(arg0.getDistance(), arg1.getDistance());
+                                return Double.compare(arg0.getDistance(), arg1.getDistance());
                             }
                         });
 
-                        Beacon nearBeacon = beacons.get(0);
-                        String uniqueID = nearBeacon.getId1().toString();
-                        String major = nearBeacon.getId2().toString();
-                        String minor = nearBeacon.getId3().toString();
-                        String rssi = String.valueOf(nearBeacon.getRssi());
-                        String distance = String.valueOf(nearBeacon.getDistance());
-                        String address = nearBeacon.getBluetoothAddress();
-                        String txPower = String.valueOf(nearBeacon.getTxPower());
-
-                        @SuppressLint("DefaultLocale")
-                        String str = String.format("Distance: %s%nUniqueID: %s%nMajor: %s%nMinor: %s%nRSSI: %s%nAddress: %s%nTxPower: %s%n",
-                                distance, uniqueID, major, minor, rssi, address, txPower);
-
-                        String location = beaconDefine.getLocationMsg(major, minor);
-                        Log.e("Debug02", str);
-                        Log.e("Debug03", location);
-
-                        updateTextViewMsg(location);
+                        Beacon beacon = beacons.get(0);
                     }
                 }
             }
-
         });
 
         try {
-            beaconManager.startRangingBeacons(new Region("Beacon_Device", null, null, null));
+            beaconManager.startRangingBeacons(new Region("Beacon", Identifier.parse("699ebc80-e1f3-11e3-9a0f-0cf3ee3bc012"), null, null));
+            beaconManager.startRangingBeacons(new Region("IPhone", Identifier.parse("594650a2-8621-401f-b5de-6eb3ee398170"), null, null));
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void updateTextViewMsg(final String location) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                tvShowDisplay.setText(location);
-            }
-        });
+    class TimerRunInBg extends Thread {
+        Message message = handler.obtainMessage();
+        Bundle bundle = new Bundle();
 
+        @Override
+        public void run() {
+            try {
+                isTimerStarted = true;
+                for(int i = 0; i <= 60; i++){
+                    if(stopThread){
+                        return;
+                    }
+                    Log.e("i", String.valueOf(i));
+                    if(i == 59){
+                        String str = "請到安全通道方能使用此功能";
+                        Log.e("str", str);
+                        bundle.putString("Key", str);
+                        message.setData(bundle);
+                        handler.sendMessage(message);
+                        beaconManager.removeAllRangeNotifiers();
+                        beaconRunning = false;
+                    }
+                    Thread.sleep(1000);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
     }
 
-    private void alertFunction(String msg) {
-        new AlertDialog.Builder(this)
-                .setTitle("Welcome to Providence University!")
-                .setMessage("Location: " + msg)
-                .setPositiveButton("OK", null)
-                .show();
+    private void showAlert(String str) {
+        AlertDialog dlg = new AlertDialog.Builder(SafetyActivity.this)
+                .setTitle("安全通道")
+                .setMessage(str)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .create();
+        dlg.show();
     }
 
     private void animationFunction() {
-        if (animationRunning) {
-            safetyAnimation.setProgress(0);
-            safetyAnimation.cancelAnimation();
-            btnSafety.setText(R.string.safety_Start);
-            animationRunning = false;
-        }
-        else {
-            safetyAnimation.playAnimation();
-            btnSafety.setText(R.string.safety_Activate);
-            animationRunning = true;
-        }
+
     }
 
     @Override

@@ -43,7 +43,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         if (!isNetworkConnected()) {
-            Toast.makeText(getApplicationContext(), "請打開網絡后，在打開APP.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "請打開網絡後，再打開APP.", Toast.LENGTH_SHORT).show();
 
             new Handler().postDelayed(new Runnable() {
                 @Override

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -42,7 +41,7 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase myDb = this.getReadableDatabase();
         Cursor cursor = myDb.rawQuery("select * from spot", null, null);
 
-        String arr[] = new String[3];
+        String[] arr = new String[cursor.getColumnCount()];
 
         for (int i = 0; i < cursor.getColumnCount(); i++) {
 
