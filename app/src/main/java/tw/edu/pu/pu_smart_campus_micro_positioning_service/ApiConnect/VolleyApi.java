@@ -1,6 +1,7 @@
 package tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect;
 
 import android.app.Activity;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -78,16 +79,10 @@ public class VolleyApi {
     public void post_API_TESTING(MaterialTextView tvText)  {
         RequestQueue requestQueue = Volley.newRequestQueue(activity);
 
-//        JsonObjectRequest method
-//        Map<String, String> postParam= new HashMap<String, String>();
-//        postParam.put("un", "*Emails are not allowed*");
-//        postParam.put("p", "somepasswordhere");
-
         StringRequest stringRequest = new StringRequest(Request.Method.POST, API_URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 tvText.setText("Post Response: " + response);
-
             }
         }, new Response.ErrorListener() {
             @Override
@@ -101,6 +96,42 @@ public class VolleyApi {
                 params.put("a", "1");
                 params.put("b", "2");
                 params.put("c", "3");
+                return params;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+        };
+
+        requestQueue.add(stringRequest);
+    }
+
+    public void post_API_Login(String id, String pass, String imei, final VolleyCallback callback)  {
+        RequestQueue requestQueue = Volley.newRequestQueue(activity);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, API_URL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Toast.makeText(activity, response, Toast.LENGTH_SHORT).show();
+                callback.onSuccess(response);
+            }
+
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(activity, error.toString(), Toast.LENGTH_SHORT).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("id", id);
+                params.put("pass", pass);
+                params.put("IMEI", imei);
                 return params;
             }
 
@@ -132,5 +163,9 @@ public class VolleyApi {
         });
 
         requestQueue.add(stringRequest);
+    }
+
+    public interface VolleyCallback{
+        void onSuccess(String result);
     }
 }
