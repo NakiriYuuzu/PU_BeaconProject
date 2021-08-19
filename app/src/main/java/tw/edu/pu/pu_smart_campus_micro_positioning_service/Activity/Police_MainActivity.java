@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -62,7 +63,13 @@ public class Police_MainActivity extends AppCompatActivity {
             startActivity(ii);
         });
 
-        btnSignOut.setOnClickListener(v -> finish());
+        btnSignOut.setOnClickListener(v -> {
+            SharedPreferences preferences = getSharedPreferences("checkBox", MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("remember", "false");
+            editor.apply();
+            finish();
+        });
     }
 
     /**
