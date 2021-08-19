@@ -7,4 +7,7 @@
     <color name="darkBlue">#023246</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="fillStroke">#8bb6f9</color>
+    <color name="strokeWidth">#4186f0</color>
 </resources>

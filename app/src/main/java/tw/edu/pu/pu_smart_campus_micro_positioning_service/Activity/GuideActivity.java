@@ -13,12 +13,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteException;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.airbnb.lottie.L;
@@ -26,6 +26,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -135,6 +136,7 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
     }
 
     private void buttonInit() {
+
         btnStart.setOnClickListener(v -> {
             new Thread(new Runnable() {
                 @Override
@@ -380,6 +382,7 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
 
         Intent intent = new Intent();
         intent.setClass(GuideActivity.this, GuideSpotActivity.class);
+        //intent.putExtra(key, "spot");
         Bundle bundle = new Bundle();
         bundle.putBoolean(key, true);
         intent.putExtras(bundle);
@@ -402,20 +405,55 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
     public void onMapReady(@NonNull GoogleMap googleMap) {
         gMap = googleMap;
 
-        LatLng pu = new LatLng(24.22614525191815, 120.57709151695924);
+        // 靜宜大學在Google Maps上的經緯度
+        //LatLng pu = new LatLng(24.22614525191815, 120.57709151695924);
+
+        // 醬範圍限定在靜宜大學
         LatLngBounds puBounds = new LatLngBounds(
-                new LatLng(24.223916511663017, 120.5763416162949),
-                new LatLng(24.22965262538798, 120.58476242960268)
+                new LatLng(24.22448382742779, 120.57652347691048),
+                new LatLng(24.22995245833786, 120.58448818883151)
         );
 
-        gMap.addMarker(new MarkerOptions().position(pu).title("Marked at PU"));
-        gMap.animateCamera(CameraUpdateFactory.newLatLngBounds(puBounds,1));
+        // 校園10個景點的經緯度
+        LatLng rome = new LatLng(24.226610134801795, 120.57928995320502); // 羅馬小劇場
+        LatLng walkway = new LatLng(24.2264189871141, 120.57889715093683); // 櫻花步道
+        LatLng library = new LatLng(24.22619638950677, 120.58132494938461); // 盖夏图书馆
+        LatLng bigLawn = new LatLng(24.22579162681339, 120.57802974150556); // 校園前大草坪
+        LatLng fountain = new LatLng(24.226702031880514, 120.581359417509); // 噴水池
+        LatLng puChapel = new LatLng(24.22806516348092, 120.58148547507882); // 主顧聖母堂
+        LatLng artCenter = new LatLng(24.22666298140053, 120.57996407804856); // 任垣藝術中心
+        LatLng sportHall = new LatLng(24.22892328815199, 120.58090492459124); // 若望保祿二世體育館
+        LatLng loverBridge = new LatLng(24.22660666908093, 120.58000585060829); // 情人橋
+        LatLng swimmingPool = new LatLng(24.229518440880714, 120.58041574557829); // 溫水游泳池
 
-//        LatLng pu = new LatLng(24.22614525191815, 120.57709151695924);
-//        gMap.addMarker(new MarkerOptions()
-//                .position(pu)
-//                .title("Marker at pu")
-//        );
-//        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pu, 16));
+        // 在地圖添加標點 和 設置標點的範圍
+        addMarker_Circle(rome, getString(R.string.Rome));
+        addMarker_Circle(walkway, getString(R.string.Cherry_Blossom_Walkway));
+        addMarker_Circle(library, getString(R.string.Library));
+        addMarker_Circle(bigLawn, getString(R.string.Big_Lawn));
+        addMarker_Circle(fountain, getString(R.string.Fountain));
+        addMarker_Circle(puChapel, getString(R.string.Providence_Chapel));
+        addMarker_Circle(artCenter, getString(R.string.Art_Center));
+        addMarker_Circle(sportHall, getString(R.string.Sport_Hall));
+        addMarker_Circle(loverBridge, getString(R.string.Lover_Bridge));
+        addMarker_Circle(swimmingPool, getString(R.string.Swimming_Pool));
+
+        // 限定縮放級別 和 地圖平移限制
+        gMap.setMinZoomPreference(15);
+        gMap.setMaxZoomPreference(19);
+        gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(puBounds, 0));
+        gMap.setLatLngBoundsForCameraTarget(puBounds);
+    }
+
+    private void addMarker_Circle(LatLng latLng, String title) {
+        gMap.addMarker(new MarkerOptions()
+                .position(latLng)
+                .title(title));
+        gMap.addCircle(new CircleOptions()
+                .center(latLng)
+                .radius(20)
+                .strokeColor(getColor(R.color.strokeWidth))
+                .fillColor(getColor(R.color.fillStroke))
+                .strokeWidth(5));
     }
 }
