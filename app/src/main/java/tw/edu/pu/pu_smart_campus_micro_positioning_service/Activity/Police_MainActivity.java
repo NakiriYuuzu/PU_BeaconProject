@@ -45,7 +45,7 @@ public class Police_MainActivity extends AppCompatActivity {
 
     private void initView() {
         btnMonitor.setOnClickListener(v -> {
-
+            Intent ii = new Intent(getApplicationContext(), MonitorActivity.class);
         });
 
         btnGuide.setOnClickListener(v -> {
