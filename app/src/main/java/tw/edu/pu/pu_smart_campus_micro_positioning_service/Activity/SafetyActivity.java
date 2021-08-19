@@ -40,12 +40,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.RunnableFuture;
+
+import javax.security.auth.login.LoginException;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconDefine;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.TimerInBg;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 
 public class SafetyActivity extends AppCompatActivity implements BeaconConsumer {
-
     private final String TAG = "SafetyActivity: ";
 
     private static final long DEFAULT_FOREGROUND_SCAN_PERIOD = 1000L; // half sec
@@ -73,6 +76,7 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
 
     private String major;
     private String minor;
+    private int Counter = 0;
 
     Handler handler = new Handler(){
         @Override
@@ -94,6 +98,7 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
         requestPermission();
         requestBluetooth();
         initButton();
+
         Log.e("isTimerStarted", String.valueOf(isTimerStarted));
         Log.e("Timer", String.valueOf(TimeLeft));
     }
@@ -131,10 +136,7 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
             Log.e(TAG, "initButton: " + animationRunning + ", " + beaconRunning);
 
             if (animationRunning && beaconRunning) {
-                safetyAnimation.setProgress(0);
-                safetyAnimation.cancelAnimation();
-                btnSafety.setText(R.string.safety_Start);
-                animationRunning = false;
+                animationStop();
 
                 beaconManager.removeAllRangeNotifiers();
                 beaconRunning = false;
@@ -142,9 +144,7 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
                 stopThread = true;
             }
             else {
-                safetyAnimation.playAnimation();
-                btnSafety.setText(R.string.safety_Activate);
-                animationRunning = true;
+                animationStart();
 
                 initBeacon();
                 TimerRunInBg timer = new TimerRunInBg();
@@ -217,6 +217,7 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
 
     @Override
     public void onBeaconServiceConnect() {
+        passData(major, minor);
         beaconManager.addRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> collection, Region region) {
@@ -232,7 +233,7 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
                     }
 
                     if (beacons.size() > 0) {
-
+                        Counter++;
                         Collections.sort(beacons, new Comparator<Beacon>() {
                             public int compare(Beacon arg0, Beacon arg1) {
                                 //Rssi 判斷
@@ -244,6 +245,8 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
                         });
 
                         Beacon beacon = beacons.get(0);
+                        major = String.valueOf(beacon.getId2());
+                        minor = String.valueOf(beacon.getId3());
                     }
                 }
             }
@@ -256,6 +259,30 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void passData(String major, String minor){
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                synchronized (this){
+                    try {
+                        wait(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if(Counter > 0){
+                    // 傳major minor 到後臺
+                    Log.e(TAG, "run: major minor 傳到後臺");
+                    Counter = 0;
+                }
+            }
+        };
+
+        Thread passThread = new Thread(runnable);
+        passThread.start();
     }
 
     class TimerRunInBg extends Thread {
@@ -302,8 +329,17 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
         dlg.show();
     }
 
-    private void animationFunction() {
+    private void animationStart() {
+        safetyAnimation.playAnimation();
+        btnSafety.setText(R.string.safety_Activate);
+        animationRunning = true;
+    }
 
+    private void animationStop(){
+        safetyAnimation.setProgress(0);
+        safetyAnimation.cancelAnimation();
+        btnSafety.setText(R.string.safety_Start);
+        animationRunning = false;
     }
 
     @Override
