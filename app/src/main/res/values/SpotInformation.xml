@@ -41,4 +41,15 @@
         "https://www.pu.edu.tw/p/406-1000-1131,r192.php?Lang=zh-tw"
     </string>
 
+    /* --------------------------------------------------------------------------------------- */
+    
+    <string name="Big_Lawn">校門前大草坪</string>
+    <string name="Cherry_Blossom_Walkway">櫻花步道</string>
+    <string name="Lover_Bridge">情人橋</string>
+    <string name="Art_Center">任垣藝術中心</string>
+    <string name="Swimming_Pool">溫水游泳池</string>
+    <string name="Library">蓋夏圖書館</string>
+    <string name="Rome">羅馬小劇場</string>
+    <string name="Fountain">噴水池</string>
+    
 </resources>
