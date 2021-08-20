@@ -1,37 +1,18 @@
 package tw.edu.pu.pu_smart_campus_micro_positioning_service.Activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothManager;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
-import com.permissionx.guolindev.PermissionX;
 
 import org.altbeacon.beacon.Beacon;
-import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
-import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
@@ -40,54 +21,37 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.RunnableFuture;
+import java.util.TimerTask;
 
-import javax.security.auth.login.LoginException;
-
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect.VolleyApi;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconDefine;
-import tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.TimerInBg;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconStore;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestItem;
 
-public class SafetyActivity extends AppCompatActivity implements BeaconConsumer {
+public class SafetyActivity extends AppCompatActivity {
+
     private final String TAG = "SafetyActivity: ";
 
-    private static final long DEFAULT_FOREGROUND_SCAN_PERIOD = 1000L; // half sec
-    private static final long DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD = 1000L; // half sec
-
-    private final double DISTANCE_THRESHOLD = 3.5f;
-    private final double DISTANCE_THRESHOLD_TEST = 0.5f;
-
-    private boolean beaconRunning = false;
     private boolean animationRunning = false;
-    private boolean isTimerStarted = false;
-    private volatile boolean stopThread = false;
+    private boolean sosIsRunning = false;
+    private boolean firstChecked = true;
+    private boolean apiChecked = true;
 
-    private static final long Timer = 10000;
-    private long TimeLeft = Timer;
-    private CountDownTimer countDownTimer;
+    private int count_Animation = 0;
+    private int count_Api = 0;
+    private int count_Alert = 0;
 
-    private BeaconManager beaconManager;
-    private BeaconDefine beaconDefine;
+    LottieAnimationView animation;
+    MaterialTextView btnSafety;
+    ShapeableImageView btnBack, btnSOS;
 
-    private MaterialButton btnStart, btnStop;
-    private ShapeableImageView btnBack;
-    private MaterialTextView tvShowDisplay, btnSafety;
-    private LottieAnimationView safetyAnimation;
+    RequestItem requestItem;
+    VolleyApi volleyApi;
+    BeaconStore beaconStore;
+    BeaconDefine beaconDefine;
 
-    private String major;
-    private String minor;
-    private int Counter = 0;
-
-    Handler handler = new Handler(){
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            Bundle bundle = msg.getData();
-            String str = bundle.getString("Key");
-
-            showAlert(str);
-        }
-    };
+    BeaconManager beaconManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,258 +59,181 @@ public class SafetyActivity extends AppCompatActivity implements BeaconConsumer 
         setContentView(R.layout.activity_safety);
 
         initView();
-        requestPermission();
-        requestBluetooth();
         initButton();
+        beaconInit();
 
-        Log.e("isTimerStarted", String.valueOf(isTimerStarted));
-        Log.e("Timer", String.valueOf(TimeLeft));
-    }
-
-    private void initBeacon() {
-        beaconManager = BeaconManager.getInstanceForApplication(this);
-
-        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
-        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25"));
-
-        beaconManager.setForegroundBetweenScanPeriod(DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD);
-        beaconManager.setForegroundScanPeriod(DEFAULT_FOREGROUND_SCAN_PERIOD);
-
-        beaconRunning = true;
+        requestItem.requestBluetooth();
     }
 
     private void initButton() {
-        btnStart.setOnClickListener(v -> {
-            initBeacon();
-            Log.e(TAG, "didRangeBeaconsInRegion: " + major + ", " + minor + ", " + isTimerStarted);
-            if(major == null && minor == null || isTimerStarted == false) {
-                TimerRunInBg timer = new TimerRunInBg();
-                timer.start();
-            }
-        });
-
-        btnStop.setOnClickListener(v -> {
-            if (beaconRunning) {
-                beaconManager.removeAllRangeNotifiers();
-                beaconRunning = false;
-            }
+        btnBack.setOnClickListener(v -> {
+            finish();
         });
 
         btnSafety.setOnClickListener(v -> {
-            Log.e(TAG, "initButton: " + animationRunning + ", " + beaconRunning);
-
-            if (animationRunning && beaconRunning) {
-                animationStop();
-
-                beaconManager.removeAllRangeNotifiers();
-                beaconRunning = false;
-
-                stopThread = true;
-            }
-            else {
+            if (!animationRunning) {
                 animationStart();
 
-                initBeacon();
-                TimerRunInBg timer = new TimerRunInBg();
-                timer.start();
-                stopThread = false;
+            } else {
+                animationStop();
             }
         });
 
-        btnBack.setOnClickListener(v -> {
-            finish();
+        btnSOS.setOnClickListener(v -> {
+            if (!sosIsRunning) {
+                sos_Start();
+            }
+            else {
+                sos_Stop();
+            }
         });
     }
 
     private void initView() {
-        tvShowDisplay = findViewById(R.id.showDisplay);
-        btnStart = findViewById(R.id.btn_Receive_Start);
-        btnStop = findViewById(R.id.btn_Receive_Stop);
+        btnSOS = findViewById(R.id.btn_safety_SOS);
         btnBack = findViewById(R.id.btn_safety_back);
-
         btnSafety = findViewById(R.id.btn_safety_trace);
+        animation = findViewById(R.id.safety_Animation);
+
         btnSafety.setText(R.string.safety_Start);
 
-        safetyAnimation = findViewById(R.id.safety_Animation);
-
-        beaconDefine = new BeaconDefine();
+        requestItem = new RequestItem(this);
     }
 
-    private void requestPermission() {
-        if (Build.VERSION.SDK_INT > 23) {
-            PermissionX.init(this)
-                    .permissions(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+    private void beaconInit() {
+        beaconManager = BeaconManager.getInstanceForApplication(this);
 
-                    .onExplainRequestReason((scope, deniedList) -> scope.showRequestReasonDialog(
-                            deniedList, "Grant Permission!", "Sure", "Cancel"))
-
-                    .request((allGranted, grantedList, deniedList) -> {
-                        if (!allGranted) {
-                            Toast.makeText(getApplicationContext(), "Grant Permission failed!", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        }
-        else {
-            Toast.makeText(getApplicationContext(), "您的手機無法使用該應用...", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-
+        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
+        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25"));
     }
 
-    private void requestBluetooth() {
-        BluetoothAdapter mBluetoothAdapter;
-
-        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH)) {
-            Toast.makeText(this, "Bluetooth is not supported!", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-
-        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this, "ble is not supported!", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-
-        final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = bluetoothManager.getAdapter();
-
-        if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
-            Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivity(enableBluetooth);
-        }
-    }
-
-    @Override
-    public void onBeaconServiceConnect() {
-        passData(major, minor);
+    private void startScanning() {
+        beaconManager.removeAllMonitorNotifiers();
+        beaconManager.removeAllRangeNotifiers();
         beaconManager.addRangeNotifier(new RangeNotifier() {
             @Override
-            public void didRangeBeaconsInRegion(Collection<Beacon> collection, Region region) {
-                if (collection.size() > 0) {
-                    stopThread = true;
-
+            public void didRangeBeaconsInRegion(Collection<Beacon> beaconCollection, Region region) {
+                if (beaconCollection.size() > 0) {
+                    count_Alert = 0;
+                    firstChecked = false;
+                    Log.e(TAG, "Success Get data");
                     List<Beacon> beacons = new ArrayList<>();
-                    for (Beacon beacon : collection) {
-                        if (beacon.getDistance() <= 30) {
-                            beacons.add(beacon);
-                            Log.e("Debug01", beacon.toString());
-                        }
+                    for (Beacon beacon : beaconCollection) {
+                        beacons.add(beacon);
                     }
 
                     if (beacons.size() > 0) {
-                        Counter++;
                         Collections.sort(beacons, new Comparator<Beacon>() {
-                            public int compare(Beacon arg0, Beacon arg1) {
-                                //Rssi 判斷
-                                //return (arg1.getRssi() - arg0.getRssi());
-
-                                //Distance 判斷
-                                return Double.compare(arg0.getDistance(), arg1.getDistance());
+                            @Override
+                            public int compare(Beacon o1, Beacon o2) {
+                                return Double.compare(o2.getDistance(), o1.getDistance());
                             }
                         });
 
-                        Beacon beacon = beacons.get(0);
-                        major = String.valueOf(beacon.getId2());
-                        minor = String.valueOf(beacon.getId3());
+                        apiTimer();
+                        if (beacons.size() > 1) {
+                            beaconStore = new BeaconStore(beacons.get(0), beacons.get(1));
+                            beaconStore.beaconData(apiChecked);
+                        }
+
+                        else if (beacons.size() == 1) {
+                            beaconStore = new BeaconStore(beacons.get(0));
+                            beaconStore.beaconData(apiChecked);
+                        }
+                    }
+
+                } else {
+                    Log.e(TAG, "NO Beacon here.");
+                    if (firstChecked) {
+                        Log.e(TAG, "Alert! 此道路暫時不支援安全通道。");
+                        count_Animation++;
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (count_Animation == 4) {
+                                    animationStop();
+                                    count_Animation = 0;
+                                }
+                            }
+                        });
+
+                    } else {
+                        dialogTimer();
                     }
                 }
             }
         });
-
         try {
-            beaconManager.startRangingBeacons(new Region("Beacon", Identifier.parse("699ebc80-e1f3-11e3-9a0f-0cf3ee3bc012"), null, null));
-            beaconManager.startRangingBeacons(new Region("IPhone", Identifier.parse("594650a2-8621-401f-b5de-6eb3ee398170"), null, null));
+            beaconManager.startRangingBeacons(new Region("", null, null, null));
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void passData(String major, String minor){
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                synchronized (this){
-                    try {
-                        wait(5000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                if(Counter > 0){
-                    // 傳major minor 到後臺
-                    Log.e(TAG, "run: major minor 傳到後臺");
-                    Counter = 0;
-                }
-            }
-        };
-
-        Thread passThread = new Thread(runnable);
-        passThread.start();
-    }
-
-    class TimerRunInBg extends Thread {
-        Message message = handler.obtainMessage();
-        Bundle bundle = new Bundle();
-
-        @Override
-        public void run() {
-            try {
-                isTimerStarted = true;
-                for(int i = 0; i <= 60; i++){
-                    if(stopThread){
-                        return;
-                    }
-                    Log.e("i", String.valueOf(i));
-                    if(i == 59){
-                        String str = "請到安全通道方能使用此功能";
-                        Log.e("str", str);
-                        bundle.putString("Key", str);
-                        message.setData(bundle);
-                        handler.sendMessage(message);
-                        beaconManager.removeAllRangeNotifiers();
-                        beaconRunning = false;
-                    }
-                    Thread.sleep(1000);
-                }
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void showAlert(String str) {
-        AlertDialog dlg = new AlertDialog.Builder(SafetyActivity.this)
-                .setTitle("安全通道")
-                .setMessage(str)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .create();
-        dlg.show();
+    private void stopScanning() {
+        beaconManager.removeAllRangeNotifiers();
     }
 
     private void animationStart() {
-        safetyAnimation.playAnimation();
+        animation.playAnimation();
         btnSafety.setText(R.string.safety_Activate);
+
+        startScanning();
+
         animationRunning = true;
     }
 
-    private void animationStop(){
-        safetyAnimation.setProgress(0);
-        safetyAnimation.cancelAnimation();
+    private void animationStop() {
+        animation.setProgress(0);
+        animation.cancelAnimation();
         btnSafety.setText(R.string.safety_Start);
+
+        stopScanning();
+
         animationRunning = false;
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (beaconRunning) {
-            beaconManager.unbind(this);
-        }
+    private void sos_Start() {
+        int imageRes = getResources().getIdentifier("sos_1", "drawable", getPackageName());
+        btnSOS.setImageResource(imageRes);
+        sosIsRunning = true;
+    }
+
+    private void sos_Stop() {
+        int imageRes = getResources().getIdentifier("sos_0", "drawable", getPackageName());
+        btnSOS.setImageResource(imageRes);
+        sosIsRunning = false;
+    }
+
+    private void apiTimer() {
+        new Handler().postDelayed(new TimerTask() {
+            @Override
+            public void run() {
+                Log.e(TAG, "count_API: " + count_Api);
+                count_Api++;
+                if (count_Api == 5) {
+                    apiChecked = true;
+                    count_Api = 0;
+
+                } else {
+                    apiChecked = false;
+                }
+            }
+        }, 1000);
+    }
+
+    private void dialogTimer() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Log.e(TAG, "count_Alert: " + count_Alert);
+                count_Alert++;
+                if (count_Alert >= 59) {
+                    count_Alert = 0;
+                    Log.e(TAG, "Alert!!!!!");
+                }
+            }
+        }, 1000);
     }
 }
