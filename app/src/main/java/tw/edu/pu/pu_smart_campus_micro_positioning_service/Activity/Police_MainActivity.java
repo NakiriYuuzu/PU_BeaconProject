@@ -14,14 +14,14 @@ import com.google.android.material.imageview.ShapeableImageView;
 import com.permissionx.guolindev.PermissionX;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
-import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.PermissionRequest;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestItem;
 
 public class Police_MainActivity extends AppCompatActivity {
 
     private MaterialCardView btnMonitor, btnGuide, btnSafety, btnCheck;
     private ShapeableImageView btnSignOut;
 
-    PermissionRequest permissionRequest;
+    RequestItem permissionRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +31,7 @@ public class Police_MainActivity extends AppCompatActivity {
         viewInit();
         initView();
         requestPermission();
-        permissionRequest.requestBluetooth(this);
+        permissionRequest.requestBluetooth();
     }
 
     private void viewInit() {
@@ -41,7 +41,7 @@ public class Police_MainActivity extends AppCompatActivity {
         btnCheck = findViewById(R.id.btn_check);
         btnSignOut = findViewById(R.id.btn_SignOut);
 
-        permissionRequest = new PermissionRequest();
+        permissionRequest = new RequestItem(this);
     }
 
     private void initView() {

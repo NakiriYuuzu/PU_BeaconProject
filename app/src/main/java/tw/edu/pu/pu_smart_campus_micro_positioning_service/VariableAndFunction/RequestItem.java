@@ -1,19 +1,24 @@
 package tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.provider.Settings;
 import android.widget.Toast;
 
-public class PermissionRequest {
+public class RequestItem {
 
-    public PermissionRequest() {
+    private Context context;
 
+    public RequestItem(Context context) {
+        this.context = context;
     }
 
-    public void requestBluetooth(Context context) {
+    public void requestBluetooth() {
         BluetoothAdapter mBluetoothAdapter;
 
         if (!context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH)) {
@@ -33,5 +38,10 @@ public class PermissionRequest {
             Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             context.startActivity(enableBluetooth);
         }
+    }
+
+    @SuppressLint("HardwareIds")
+    public String requestIMEI() {
+        return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 }
