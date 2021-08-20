@@ -26,7 +26,7 @@ public class BeaconStore {
         ArrayList<String> firstBeacon = new ArrayList<>();
         ArrayList<String> secondBeacon = new ArrayList<>();
 
-        if(beaconDefine.getLocationMsg(o1.getId2().toString(), o1.getId3().toString()) != "暂无位置信息") {
+        if (!beaconDefine.getLocationMsg(o1.getId2().toString(), o1.getId3().toString()).equals("暂无位置信息")) {
             firstBeacon.add(o1.getId2().toString());
             firstBeacon.add(o1.getId3().toString());
             firstBeacon.add(String.valueOf(o1.getRssi()));
@@ -35,7 +35,7 @@ public class BeaconStore {
         }
 
         if (o2 != null) {
-            if(beaconDefine.getLocationMsg(o2.getId2().toString(), o2.getId3().toString()) != "暂无位置信息") {
+            if (!beaconDefine.getLocationMsg(o2.getId2().toString(), o2.getId3().toString()).equals("暂无位置信息")) {
                 secondBeacon.add(o2.getId2().toString());
                 secondBeacon.add(o2.getId3().toString());
                 secondBeacon.add(String.valueOf(o2.getRssi()));
@@ -47,12 +47,12 @@ public class BeaconStore {
         // Sending data
         if (apiChecked) {
             if (firstBeacon.size() > 0) {
-                Log.e("Safety", "DATA_1 was sent");
+                Log.e("Safety", beaconDefine.getLocationMsg(firstBeacon.get(0), firstBeacon.get(1)) + " was sent");
 
             }
 
             if (secondBeacon.size() > 0) {
-                Log.e("Safety", "DATA_2 was sent");
+                Log.e("Safety", beaconDefine.getLocationMsg(secondBeacon.get(0), secondBeacon.get(1)) + " was sent");
             }
         }
     }

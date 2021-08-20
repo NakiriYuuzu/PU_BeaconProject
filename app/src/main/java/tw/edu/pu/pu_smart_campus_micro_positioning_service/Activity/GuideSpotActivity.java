@@ -43,13 +43,13 @@ public class GuideSpotActivity extends AppCompatActivity {
 
             tvName.setText(spotData[0]);
             tvGuideInfo.setText(spotData[1]);
-            if(str == "主顧聖母堂") {
+            if(str.equals("主顧聖母堂")) {
                 ivSpotImage.setImageResource(R.drawable.providence_chapel);
             }
-            else if(str == "主顧樓"){
+            else if(str.equals("主顧樓")){
                 ivSpotImage.setImageResource(R.drawable.providence_hall);
             }
-            else if(str == "若望保祿二世體育館"){
+            else if(str.equals("若望保祿二世體育館")){
                 ivSpotImage.setImageResource(R.drawable.sport_hall);
             }
 
