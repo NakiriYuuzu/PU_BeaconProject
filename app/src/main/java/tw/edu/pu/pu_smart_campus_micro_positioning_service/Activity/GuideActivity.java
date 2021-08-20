@@ -408,7 +408,7 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
         // 靜宜大學在Google Maps上的經緯度
         //LatLng pu = new LatLng(24.22614525191815, 120.57709151695924);
 
-        // 醬範圍限定在靜宜大學
+        // 將範圍限定在靜宜大學
         LatLngBounds puBounds = new LatLngBounds(
                 new LatLng(24.22448382742779, 120.57652347691048),
                 new LatLng(24.22995245833786, 120.58448818883151)
