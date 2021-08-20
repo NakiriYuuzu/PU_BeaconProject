@@ -31,6 +31,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 import com.permissionx.guolindev.PermissionX;
 
@@ -74,6 +75,7 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
 
     private MaterialButton btnStart, btnStop;
     private MaterialTextView tvShowDisplay;
+    private ShapeableImageView btnBack;
 
     private ArrayList<HashMap<String, String>> beaconMap = new ArrayList<>();
     private HashMap<String, Integer> regionMap = new HashMap<>();
@@ -82,14 +84,6 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
     private String TmpMajor;
     private String TmpMinor;
     private boolean shouldShowAlert = true;
-
-    private Timer timer = new Timer();
-    private TimerTask task = new TimerTask() {
-        @Override
-        public void run() {
-
-        }
-    };
 
     Handler objHandler = new Handler() {
 
@@ -136,6 +130,9 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
     }
 
     private void buttonInit() {
+        btnBack.setOnClickListener(v -> {
+            finish();
+        });
 
         btnStart.setOnClickListener(v -> {
             new Thread(new Runnable() {
@@ -156,6 +153,7 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
 
     private void initView() {
         //findView
+        btnBack = findViewById(R.id.btn_Guide_back);
         tvShowDisplay = findViewById(R.id.tv_Guide_information);
         btnStart = findViewById(R.id.btn_Guide_Start);
         btnStop = findViewById(R.id.btn_Guide_Stop);

@@ -1,6 +1,7 @@
 package tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect;
 
 import android.app.Activity;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -15,6 +16,7 @@ import com.google.android.material.textview.MaterialTextView;
 
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -116,29 +118,27 @@ public class VolleyApi {
         StringRequest stringRequest = new StringRequest(Request.Method.POST, API_URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Toast.makeText(activity, response, Toast.LENGTH_SHORT).show();
                 callback.onSuccess(response);
             }
 
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(activity, error.toString(), Toast.LENGTH_SHORT).show();
+                Log.e("abc", error.toString());
             }
         }){
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                params.put("id", id);
-                params.put("pass", pass);
-                params.put("IMEI", imei);
+                params.put("sidimei", id);
+                params.put("password", pass);
                 return params;
             }
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<>();
-                headers.put("Content-Type", "application/json; charset=utf-8");
+                headers.put("Accept", "application/json");
                 return headers;
             }
         };
@@ -167,5 +167,6 @@ public class VolleyApi {
 
     public interface VolleyCallback{
         void onSuccess(String result);
+//        void onFailed(VolleyError error);
     }
 }

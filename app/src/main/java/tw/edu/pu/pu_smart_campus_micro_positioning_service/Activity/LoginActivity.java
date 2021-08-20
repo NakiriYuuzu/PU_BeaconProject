@@ -30,7 +30,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private final String TAG = "Login Debug: ";
 
-    private String status;
+    private String token, userNames;
+    private int role;
 
     private TextInputEditText etAcc, etPass;
     private MaterialButton btnLogin, btnGuest;
@@ -126,16 +127,22 @@ public class LoginActivity extends AppCompatActivity {
             } else {
                 Log.e("Yuuzu", requestItem.requestIMEI());
 
-                VolleyApi volleyApi = new VolleyApi(LoginActivity.this, "https://reqbin.com/echo/post/json");
+                VolleyApi volleyApi = new VolleyApi(LoginActivity.this, "http://120.110.93.246/CAMEFSC1/public/api/login/user");
 
                 volleyApi.post_API_Login(user, pass, requestItem.requestIMEI(), new VolleyApi.VolleyCallback() {
                     @Override
                     public void onSuccess(String result) {
+                        Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
                         try {
-                            JSONObject requestStatus = new JSONObject(result);
-                            status = requestStatus.getString("success");
+                            JSONObject jsonData = new JSONObject(result);
+                            token = jsonData.getString("token");
+                            userNames = jsonData.getString("name");
+                            role = jsonData.getInt("role");
+                            
+                            if (token.equals("Unauthorised")) {
+                                Toast.makeText(getApplicationContext(), "Sign in failed...", Toast.LENGTH_SHORT).show();
 
-                            if (status.equals("true")) {
+                            } else {
                                 Toast.makeText(getApplicationContext(), "Sign in Successfully!", Toast.LENGTH_SHORT).show();
                                 Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
                                 ii.putExtra("ID", user);
