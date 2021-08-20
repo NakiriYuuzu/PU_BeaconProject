@@ -309,19 +309,19 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
 
                         switch (beaconDefine.getLocationMsg(major, minor)) {
                             case "IBEACON_10":
-                                str = String.format("景點名稱：聖母堂");
+                                str = String.format("主顧聖母堂");
                                 objBundle.putString("MSG_key", str);
                                 objMessage.setData(objBundle);
                                 shouldShowAlert = false;
                                 break;
                             case "IBEACON_11":
-                                str = String.format("景點名稱：主顧樓");
+                                str = String.format("主顧樓");
                                 objBundle.putString("MSG_key", str);
                                 objMessage.setData(objBundle);
                                 shouldShowAlert = false;
                                 break;
                             case "IBEACON_21":
-                                str = String.format("景點名稱：保祿二世體育館");
+                                str = String.format("若望保祿二世體育館");
                                 objBundle.putString("MSG_key", str);
                                 objMessage.setData(objBundle);
                                 shouldShowAlert = false;
@@ -358,16 +358,10 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (str) {
-                            case "景點名稱：聖母堂":
-                                intentToGuideSpot("spot01");
-                                Log.e(TAG, "onClick: " + str);
-                                break;
-                            case "景點名稱：主顧樓":
-                                intentToGuideSpot("spot02");
-                                Log.e(TAG, "onClick: " + str);
-                                break;
-                            case "景點名稱：保祿二世體育館":
-                                intentToGuideSpot("spot03");
+                            case "主顧聖母堂":
+                            case "主顧樓":
+                            case "若望保祿二世體育館":
+                                intentToGuideSpot(str);
                                 Log.e(TAG, "onClick: " + str);
                                 break;
                         }
@@ -378,13 +372,13 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
         dlg.show();
     }
 
-    private void intentToGuideSpot(String key) {
+    private void intentToGuideSpot(String str) {
 
         Intent intent = new Intent();
         intent.setClass(GuideActivity.this, GuideSpotActivity.class);
         //intent.putExtra(key, "spot");
         Bundle bundle = new Bundle();
-        bundle.putBoolean(key, true);
+        bundle.putString("Key", str);
         intent.putExtras(bundle);
         startActivity(intent);
 

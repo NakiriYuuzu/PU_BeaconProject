@@ -13,6 +13,7 @@ import com.google.android.material.textview.MaterialTextView;
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
+import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
@@ -164,7 +165,7 @@ public class SafetyActivity extends AppCompatActivity {
             }
         });
         try {
-            beaconManager.startRangingBeacons(new Region("", null, null, null));
+            beaconManager.startRangingBeacons(new Region("Beacon", Identifier.parse("699ebc80-e1f3-11e3-9a0f-0cf3ee3bc012"), null, null));
 
         } catch (Exception e) {
             e.printStackTrace();

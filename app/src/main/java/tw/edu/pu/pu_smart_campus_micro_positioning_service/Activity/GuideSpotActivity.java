@@ -35,54 +35,29 @@ public class GuideSpotActivity extends AppCompatActivity {
         String [] spotData;
 
         Bundle bundle = getIntent().getExtras();
+        String str = bundle.getString("Key");
 
-        if (bundle.getBoolean("spot01")) {
 
-            spotData = DB.fetchSpotData("主顧聖母堂");
-            if(spotData.length > 0){
+        spotData = DB.fetchSpotData(str);
+        if(spotData.length > 0){
 
-                tvName.setText(spotData[0]);
-                tvGuideInfo.setText(spotData[1]);
+            tvName.setText(spotData[0]);
+            tvGuideInfo.setText(spotData[1]);
+            if(str == "主顧聖母堂") {
                 ivSpotImage.setImageResource(R.drawable.providence_chapel);
-
-                btnUrl.setOnClickListener(v -> {
-                    Uri uri = Uri.parse(spotData[2]);
-                    Intent intent = new Intent(Intent.ACTION_VIEW,uri);
-                    startActivity(intent);
-                });
             }
-        }
-        else if (bundle.getBoolean("spot02")) {
-
-            spotData = DB.fetchSpotData("主顧樓");
-            if(spotData.length > 0){
-
-                tvName.setText(spotData[0]);
-                tvGuideInfo.setText(spotData[1]);
-                ivSpotImage.setImageResource(R.drawable.providence_chapel);
-
-                btnUrl.setOnClickListener(v -> {
-                    Uri uri = Uri.parse(spotData[2]);
-                    Intent intent = new Intent(Intent.ACTION_VIEW,uri);
-                    startActivity(intent);
-                });
+            else if(str == "主顧樓"){
+                ivSpotImage.setImageResource(R.drawable.providence_hall);
             }
-        }
-        else if (bundle.getBoolean("spot03")) {
-
-            spotData = DB.fetchSpotData("體育館");
-            if(spotData.length > 0){
-
-                tvName.setText(spotData[0]);
-                tvGuideInfo.setText(spotData[1]);
-                ivSpotImage.setImageResource(R.drawable.providence_chapel);
-
-                btnUrl.setOnClickListener(v -> {
-                    Uri uri = Uri.parse(spotData[2]);
-                    Intent intent = new Intent(Intent.ACTION_VIEW,uri);
-                    startActivity(intent);
-                });
+            else if(str == "若望保祿二世體育館"){
+                ivSpotImage.setImageResource(R.drawable.sport_hall);
             }
+
+            btnUrl.setOnClickListener(v -> {
+                Uri uri = Uri.parse(spotData[2]);
+                Intent intent = new Intent(Intent.ACTION_VIEW,uri);
+                startActivity(intent);
+            });
         }
     }
 
