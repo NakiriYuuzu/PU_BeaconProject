@@ -24,12 +24,11 @@ import org.json.JSONObject;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect.VolleyApi;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestItem;
 
 public class LoginActivity extends AppCompatActivity {
 
     private final String TAG = "Login Debug: ";
-
-    public static String deviceIMEI;
 
     private String status;
 
@@ -37,12 +36,14 @@ public class LoginActivity extends AppCompatActivity {
     private MaterialButton btnLogin, btnGuest;
     private CheckBox btnRememberMe;
 
+    RequestItem requestItem;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        if (!isNetworkConnected()) {
+        if (!(requestNetworkConnection())) {
             Toast.makeText(getApplicationContext(), "請打開網絡後，再打開APP.", Toast.LENGTH_SHORT).show();
 
             new Handler().postDelayed(new Runnable() {
@@ -58,10 +59,8 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-
-    private boolean isNetworkConnected() {
+    private boolean requestNetworkConnection() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-
         return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
     }
 
@@ -111,6 +110,8 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         btnGuest = findViewById(R.id.btn_Guest);
         btnRememberMe = findViewById(R.id.checkBox_rememberMe);
+
+        requestItem = new RequestItem(this);
     }
 
     @SuppressLint("HardwareIds")
@@ -123,13 +124,11 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(this, "Please enter all the fields!", Toast.LENGTH_SHORT).show();
 
             } else {
-                //getIMEI
-                deviceIMEI = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-                Log.e("Yuuzu", deviceIMEI);
+                Log.e("Yuuzu", requestItem.requestIMEI());
 
                 VolleyApi volleyApi = new VolleyApi(LoginActivity.this, "https://reqbin.com/echo/post/json");
 
-                volleyApi.post_API_Login(user, pass, deviceIMEI, new VolleyApi.VolleyCallback() {
+                volleyApi.post_API_Login(user, pass, requestItem.requestIMEI(), new VolleyApi.VolleyCallback() {
                     @Override
                     public void onSuccess(String result) {
                         try {
@@ -159,9 +158,5 @@ public class LoginActivity extends AppCompatActivity {
     private void guestFunction() {
         Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
         startActivity(ii);
-    }
-
-    private void loginApiData(VolleyApi.VolleyCallback volleyCallback) {
-
     }
 }

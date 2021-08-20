@@ -28,13 +28,14 @@ import tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect.VolleyApi;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconDefine;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconStore;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
-import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.PermissionRequest;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestItem;
 
 public class SafetyActivity extends AppCompatActivity {
 
     private final String TAG = "SafetyActivity: ";
 
     private boolean animationRunning = false;
+    private boolean sosIsRunning = false;
     private boolean firstChecked = true;
     private boolean apiChecked = true;
 
@@ -44,9 +45,9 @@ public class SafetyActivity extends AppCompatActivity {
 
     LottieAnimationView animation;
     MaterialTextView btnSafety;
-    ShapeableImageView btnBack;
+    ShapeableImageView btnBack, btnSOS;
 
-    PermissionRequest permissionRequest;
+    RequestItem requestItem;
     VolleyApi volleyApi;
     BeaconStore beaconStore;
     BeaconDefine beaconDefine;
@@ -62,7 +63,7 @@ public class SafetyActivity extends AppCompatActivity {
         initButton();
         beaconInit();
 
-        permissionRequest.requestBluetooth(this);
+        requestItem.requestBluetooth();
     }
 
     private void initButton() {
@@ -78,16 +79,26 @@ public class SafetyActivity extends AppCompatActivity {
                 animationStop();
             }
         });
+
+        btnSOS.setOnClickListener(v -> {
+            if (!sosIsRunning) {
+                sos_Start();
+            }
+            else {
+                sos_Stop();
+            }
+        });
     }
 
     private void initView() {
+        btnSOS = findViewById(R.id.btn_safety_SOS);
         btnBack = findViewById(R.id.btn_safety_back);
         btnSafety = findViewById(R.id.btn_safety_trace);
         animation = findViewById(R.id.safety_Animation);
 
         btnSafety.setText(R.string.safety_Start);
 
-        permissionRequest = new PermissionRequest();
+        requestItem = new RequestItem(this);
     }
 
     private void beaconInit() {
@@ -182,6 +193,18 @@ public class SafetyActivity extends AppCompatActivity {
         stopScanning();
 
         animationRunning = false;
+    }
+
+    private void sos_Start() {
+        int imageRes = getResources().getIdentifier("sos_1", "drawable", getPackageName());
+        btnSOS.setImageResource(imageRes);
+        sosIsRunning = true;
+    }
+
+    private void sos_Stop() {
+        int imageRes = getResources().getIdentifier("sos_0", "drawable", getPackageName());
+        btnSOS.setImageResource(imageRes);
+        sosIsRunning = false;
     }
 
     private void apiTimer() {
