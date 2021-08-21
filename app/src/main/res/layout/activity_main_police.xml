@@ -66,7 +66,7 @@
 
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/studentID"
+        android:id="@+id/userNames"
         android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:text=""
@@ -84,7 +84,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/studentID"
+        app:layout_constraintTop_toBottomOf="@+id/userNames"
         app:layout_constraintVertical_bias="0.0">
 
         <androidx.constraintlayout.widget.ConstraintLayout

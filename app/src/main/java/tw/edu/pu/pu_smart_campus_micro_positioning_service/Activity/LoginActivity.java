@@ -9,12 +9,13 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Settings;
 import android.util.Log;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
+import com.android.volley.NetworkResponse;
+import com.android.volley.VolleyError;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -29,9 +30,6 @@ import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.R
 public class LoginActivity extends AppCompatActivity {
 
     private final String TAG = "Login Debug: ";
-
-    private String token, userNames;
-    private int role;
 
     private TextInputEditText etAcc, etPass;
     private MaterialButton btnLogin, btnGuest;
@@ -129,28 +127,37 @@ public class LoginActivity extends AppCompatActivity {
 
                 VolleyApi volleyApi = new VolleyApi(LoginActivity.this, "http://120.110.93.246/CAMEFSC1/public/api/login/user");
 
-                volleyApi.post_API_Login(user, pass, requestItem.requestIMEI(), new VolleyApi.VolleyCallback() {
+                volleyApi.post_API_Login(user, pass, new VolleyApi.VolleyCallback() {
                     @Override
                     public void onSuccess(String result) {
                         Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
                         try {
                             JSONObject jsonData = new JSONObject(result);
-                            token = jsonData.getString("token");
-                            userNames = jsonData.getString("name");
-                            role = jsonData.getInt("role");
-                            
-                            if (token.equals("Unauthorised")) {
-                                Toast.makeText(getApplicationContext(), "Sign in failed...", Toast.LENGTH_SHORT).show();
+                            String token = jsonData.getString("token");
+                            String users = jsonData.getString("name");
+                            int role = jsonData.getInt("role");
 
-                            } else {
-                                Toast.makeText(getApplicationContext(), "Sign in Successfully!", Toast.LENGTH_SHORT).show();
-                                Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
-                                ii.putExtra("ID", user);
-                                startActivity(ii);
-                            }
+                            Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
+                            ii.putExtra("tokens", token);
+                            ii.putExtra("users", users);
+                            ii.putExtra("role", role);
+
+                            Toast.makeText(getApplicationContext(), "登入成功", Toast.LENGTH_SHORT).show();
+
+                            startActivity(ii);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onFailed(VolleyError error) {
+                        if (error.networkResponse.statusCode == 401) {
+                            Toast.makeText(getApplicationContext(), "登入失敗，賬號密碼錯誤", Toast.LENGTH_SHORT).show();
+
+                        } else {
+                            Toast.makeText(getApplicationContext(), "連接伺服器失敗", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -163,7 +170,36 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void guestFunction() {
-        Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
-        startActivity(ii);
+        VolleyApi volleyApi = new VolleyApi(this, "http://120.110.93.246/CAMEFSC1/public/api/login/tourist");
+        volleyApi.post_API_Login_Guest(requestItem.requestIMEI(), new VolleyApi.VolleyCallback() {
+            @Override
+            public void onSuccess(String result) {
+                JSONObject jsonData = null;
+                try {
+                    jsonData = new JSONObject(result);
+                    String token = jsonData.getString("token");
+                    String users = "tourist";
+
+                    Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
+                    ii.putExtra("tokens", token);
+                    ii.putExtra("users", users);
+
+                    startActivity(ii);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailed(VolleyError error) {
+                if (error.networkResponse.statusCode == 400) {
+                    Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
+
+                } else {
+                    Toast.makeText(getApplicationContext(), "連接伺服器失敗", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }

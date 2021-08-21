@@ -39,13 +39,11 @@ public class CheckActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
 
         btnPost.setOnClickListener(v -> {
-            volleyApi = new VolleyApi(CheckActivity.this, "https://reqbin.com/echo/post/json");
-            volleyApi.post_API_TESTING(tvTest);
+
         });
 
         btnGet.setOnClickListener(v -> {
-            volleyApi = new VolleyApi(CheckActivity.this, "https://reqbin.com/echo/get/json");
-            volleyApi.get_API_TESTING(tvTest);
+
         });
     }
 }
