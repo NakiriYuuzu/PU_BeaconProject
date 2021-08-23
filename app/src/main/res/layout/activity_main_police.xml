@@ -69,6 +69,7 @@
         android:id="@+id/userNames"
         android:layout_width="160dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
         android:text=""
         android:textAlignment="textStart"
         android:textColor="@color/lightBlue"

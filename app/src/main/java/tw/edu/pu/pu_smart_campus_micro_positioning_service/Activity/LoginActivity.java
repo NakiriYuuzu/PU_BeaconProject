@@ -170,6 +170,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void guestFunction() {
+//        Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
+//        startActivity(ii);
         VolleyApi volleyApi = new VolleyApi(this, "http://120.110.93.246/CAMEFSC1/public/api/login/tourist");
         volleyApi.post_API_Login_Guest(requestItem.requestIMEI(), new VolleyApi.VolleyCallback() {
             @Override
@@ -193,11 +195,16 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailed(VolleyError error) {
-                if (error.networkResponse.statusCode == 400) {
-                    Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
+                try {
+                    if (error.networkResponse.statusCode == 400) {
+                        Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
 
-                } else {
-                    Toast.makeText(getApplicationContext(), "連接伺服器失敗", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "連接伺服器失敗", Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         });

@@ -1,15 +1,15 @@
 package tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction;
 
-import static tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.LoginConstants.KEY_ID;
-import static tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.LoginConstants.KEY_PASSWORD;
+import static tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.Login_Variable.KEY_ID;
+import static tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.Login_Variable.KEY_PASSWORD;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-public class AutoLogin {
+public class Login_Auto {
 
-    public AutoLogin() {
+    public Login_Auto() {
 
     }
 

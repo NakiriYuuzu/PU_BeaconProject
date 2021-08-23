@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:layout_marginBottom="10dp">
+    android:layout_marginBottom="15dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -35,7 +35,7 @@
                 app:strokeWidth="2dp">
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/iv_check_recycleView_spot"
+                    android:id="@+id/iv_check_recycleView_Image"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:layout_marginStart="5dp"
