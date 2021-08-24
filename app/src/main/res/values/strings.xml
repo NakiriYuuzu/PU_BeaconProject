@@ -18,6 +18,10 @@
     <string name="title_guide">景點導覽</string>
     <string name="title_check">人流查詢</string>
 
+    <!--Activity Check-->
+    <string name="check_detail">詳細顯示</string>
+    <string name="check_chart">圖表顯示</string>
+
     <!--Activity safety-->
     <string name="title_safety">安全通道</string>
     <string name="safety_Start">安全導覽</string>

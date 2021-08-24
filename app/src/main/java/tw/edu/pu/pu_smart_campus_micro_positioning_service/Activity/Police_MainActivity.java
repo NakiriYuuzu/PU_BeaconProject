@@ -7,10 +7,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.textview.MaterialTextView;
 import com.permissionx.guolindev.PermissionX;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
@@ -19,7 +22,11 @@ import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.R
 public class Police_MainActivity extends AppCompatActivity {
 
     private MaterialCardView btnMonitor, btnGuide, btnSafety, btnCheck;
+    private MaterialTextView userNames;
     private ShapeableImageView btnSignOut;
+
+    private int role;
+    private String users;
 
     RequestItem permissionRequest;
 
@@ -29,7 +36,9 @@ public class Police_MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main_police);
 
         viewInit();
-        initView();
+        initData();
+        roleCheck();
+        btnInit();
         requestPermission();
         permissionRequest.requestBluetooth();
     }
@@ -40,13 +49,36 @@ public class Police_MainActivity extends AppCompatActivity {
         btnSafety = findViewById(R.id.btn_safety);
         btnCheck = findViewById(R.id.btn_check);
         btnSignOut = findViewById(R.id.btn_SignOut);
+        userNames = findViewById(R.id.userNames);
 
         permissionRequest = new RequestItem(this);
     }
 
-    private void initView() {
+    private void initData() {
+        Intent intent = getIntent();
+        if (intent != null) {
+            users = intent.getStringExtra("users");
+            role = intent.getIntExtra("role", 0);
+        }
+
+        userNames.setText(users);
+        Log.e("INTENT", users + role);
+    }
+
+    private void roleCheck() {
+        if (role == 1 || role == 3) {
+            btnMonitor.setVisibility(View.INVISIBLE);
+        }
+        else if (role == 0) {
+            btnMonitor.setVisibility(View.INVISIBLE);
+            btnSafety.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void btnInit() {
         btnMonitor.setOnClickListener(v -> {
             Intent ii = new Intent(getApplicationContext(), MonitorActivity.class);
+            startActivity(ii);
         });
 
         btnGuide.setOnClickListener(v -> {

@@ -15,6 +15,6 @@ public class check_ViewModel extends ViewModel {
     public void setTotalPPL(int s) {totalPPL.setValue(s);}
     public LiveData<Integer> getTotalPPL() {return totalPPL;}
 
-    public void setLocationImage(int s) {totalPPL.setValue(s);}
-    public LiveData<Integer> getLocationImage() {return totalPPL;}
+    public void setLocationImage(int s) {locationImage.setValue(s);}
+    public LiveData<Integer> getLocationImage() {return locationImage;}
 }
