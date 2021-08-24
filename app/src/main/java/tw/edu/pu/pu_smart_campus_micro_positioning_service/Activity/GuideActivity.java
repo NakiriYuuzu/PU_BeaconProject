@@ -116,7 +116,7 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
         initView();
         requestPermission();
         requestBluetooth();
-        buttonInit();
+        beaconInit();
         createSpotData();
     }
 
@@ -135,31 +135,8 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
         beaconManager.bind(this);
     }
 
-    private void buttonInit() {
-
-        btnStart.setOnClickListener(v -> {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    beaconInit();
-                }
-            }).start();
-        });
-
-        btnStop.setOnClickListener(v -> {
-            if (beaconIsRunning) {
-                beaconManager.removeAllRangeNotifiers();
-                beaconIsRunning = false;
-            }
-        });
-    }
-
     private void initView() {
         //findView
-        tvShowDisplay = findViewById(R.id.tv_Guide_information);
-        btnStart = findViewById(R.id.btn_Guide_Start);
-        btnStop = findViewById(R.id.btn_Guide_Stop);
-
         beaconDefine = new BeaconDefine();
 
         // Google Maps findView
@@ -376,7 +353,6 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
 
         Intent intent = new Intent();
         intent.setClass(GuideActivity.this, GuideSpotActivity.class);
-        //intent.putExtra(key, "spot");
         Bundle bundle = new Bundle();
         bundle.putString("Key", str);
         intent.putExtras(bundle);
@@ -433,7 +409,7 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
         addMarker_Circle(swimmingPool, getString(R.string.Swimming_Pool));
 
         // 限定縮放級別 和 地圖平移限制
-        gMap.setMinZoomPreference(15);
+        gMap.setMinZoomPreference(16);
         gMap.setMaxZoomPreference(19);
         gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(puBounds, 0));
         gMap.setLatLngBoundsForCameraTarget(puBounds);
