@@ -170,43 +170,43 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void guestFunction() {
-//        Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
-//        startActivity(ii);
-        VolleyApi volleyApi = new VolleyApi(this, "http://120.110.93.246/CAMEFSC1/public/api/login/tourist");
-        volleyApi.post_API_Login_Guest(requestItem.requestIMEI(), new VolleyApi.VolleyCallback() {
-            @Override
-            public void onSuccess(String result) {
-                JSONObject jsonData = null;
-                try {
-                    jsonData = new JSONObject(result);
-                    String token = jsonData.getString("token");
-                    String users = "tourist";
-
-                    Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
-                    ii.putExtra("tokens", token);
-                    ii.putExtra("users", users);
-
-                    startActivity(ii);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailed(VolleyError error) {
-                try {
-                    if (error.networkResponse.statusCode == 400) {
-                        Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
-
-                    } else {
-                        Toast.makeText(getApplicationContext(), "連接伺服器失敗", Toast.LENGTH_SHORT).show();
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
+        startActivity(ii);
+//        VolleyApi volleyApi = new VolleyApi(this, "http://120.110.93.246/CAMEFSC1/public/api/login/tourist");
+//        volleyApi.post_API_Login_Guest(requestItem.requestIMEI(), new VolleyApi.VolleyCallback() {
+//            @Override
+//            public void onSuccess(String result) {
+//                JSONObject jsonData = null;
+//                try {
+//                    jsonData = new JSONObject(result);
+//                    String token = jsonData.getString("token");
+//                    String users = "tourist";
+//
+//                    Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
+//                    ii.putExtra("tokens", token);
+//                    ii.putExtra("users", users);
+//
+//                    startActivity(ii);
+//
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailed(VolleyError error) {
+//                try {
+//                    if (error.networkResponse.statusCode == 400) {
+//                        Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
+//
+//                    } else {
+//                        Toast.makeText(getApplicationContext(), "連接伺服器失敗", Toast.LENGTH_SHORT).show();
+//                    }
+//
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
     }
 }

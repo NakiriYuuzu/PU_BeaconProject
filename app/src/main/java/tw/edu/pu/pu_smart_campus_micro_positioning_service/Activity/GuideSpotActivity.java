@@ -5,29 +5,49 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.Toast;
 
+import com.android.volley.VolleyError;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect.VolleyApi;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Database.DBHelper;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 
 public class GuideSpotActivity extends AppCompatActivity {
 
-
     private MaterialTextView tvName, tvGuideInfo;
     private ShapeableImageView btnBack, ivSpotImage;
     private MaterialButton btnUrl;
+
+    VolleyApi volleyApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guide_spot);
 
-        findView();
+        viewInit();
         buttonInit();
+        getData();
         createInformation();
+    }
+
+    private void getData() {
+        volleyApi = new VolleyApi(this, "https://nakiriyuuzu.github.io/volleyTest/dat.php");
+        volleyApi.get_API_GuideActivity(new VolleyApi.VolleyCallback() {
+            @Override
+            public void onSuccess(String result) {
+                Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailed(VolleyError error) {
+                Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void createInformation() {
@@ -61,7 +81,7 @@ public class GuideSpotActivity extends AppCompatActivity {
         }
     }
 
-    private void findView() {
+    private void viewInit() {
         tvName = findViewById(R.id.tvName);
         ivSpotImage = findViewById(R.id.ivSpotImage);
         btnUrl = findViewById(R.id.btnUrl);
