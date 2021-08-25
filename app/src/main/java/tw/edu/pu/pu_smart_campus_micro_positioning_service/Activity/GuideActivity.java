@@ -110,7 +110,7 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
         initView();
         requestPermission();
         requestBluetooth();
-        buttonInit();
+        beaconInit();
         createSpotData();
     }
 
@@ -154,10 +154,6 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
     private void initView() {
         //findView
         btnBack = findViewById(R.id.btn_Guide_back);
-        tvShowDisplay = findViewById(R.id.tv_Guide_information);
-        btnStart = findViewById(R.id.btn_Guide_Start);
-        btnStop = findViewById(R.id.btn_Guide_Stop);
-
         beaconDefine = new BeaconDefine();
 
         // Google Maps findView
@@ -374,7 +370,6 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
 
         Intent intent = new Intent();
         intent.setClass(GuideActivity.this, GuideSpotActivity.class);
-        //intent.putExtra(key, "spot");
         Bundle bundle = new Bundle();
         bundle.putString("Key", str);
         intent.putExtras(bundle);
@@ -407,43 +402,43 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
         );
 
         // 校園10個景點的經緯度
-        LatLng rome = new LatLng(24.226610134801795, 120.57928995320502); // 羅馬小劇場
-        LatLng walkway = new LatLng(24.2264189871141, 120.57889715093683); // 櫻花步道
-        LatLng library = new LatLng(24.22619638950677, 120.58132494938461); // 盖夏图书馆
-        LatLng bigLawn = new LatLng(24.22579162681339, 120.57802974150556); // 校園前大草坪
-        LatLng fountain = new LatLng(24.226702031880514, 120.581359417509); // 噴水池
-        LatLng puChapel = new LatLng(24.22806516348092, 120.58148547507882); // 主顧聖母堂
-        LatLng artCenter = new LatLng(24.22666298140053, 120.57996407804856); // 任垣藝術中心
-        LatLng sportHall = new LatLng(24.22892328815199, 120.58090492459124); // 若望保祿二世體育館
-        LatLng loverBridge = new LatLng(24.22660666908093, 120.58000585060829); // 情人橋
-        LatLng swimmingPool = new LatLng(24.229518440880714, 120.58041574557829); // 溫水游泳池
+        LatLng rome = new LatLng(24.22656871091271, 120.57929918020874); // 羅馬小劇場
+        LatLng walkway = new LatLng(24.226427833581084, 120.57887211932552); // 櫻花步道
+        LatLng library = new LatLng(24.226204112427833, 120.58132421032526); // 盖夏图书馆
+        LatLng bigLawn = new LatLng(24.225789857013105, 120.57800583799148); // 校園前大草坪
+        LatLng fountain = new LatLng(24.226700226331236, 120.58135686967283); // 噴水池
+        LatLng puChapel = new LatLng(24.228066079615992, 120.58148984619457); // 主顧聖母堂
+        LatLng artCenter = new LatLng(24.226646215767868, 120.57996053368652); // 任垣藝術中心
+        LatLng sportHall = new LatLng(24.229192561674754, 120.58106247771143); // 若望保祿二世體育館
+        LatLng loverBridge = new LatLng(24.226613625861138, 120.58000175246843); // 情人橋
+        LatLng swimmingPool = new LatLng(24.22942687416963, 120.58019098909462); // 溫水游泳池
 
         // 在地圖添加標點 和 設置標點的範圍
-        addMarker_Circle(rome, getString(R.string.Rome));
-        addMarker_Circle(walkway, getString(R.string.Cherry_Blossom_Walkway));
-        addMarker_Circle(library, getString(R.string.Library));
-        addMarker_Circle(bigLawn, getString(R.string.Big_Lawn));
-        addMarker_Circle(fountain, getString(R.string.Fountain));
-        addMarker_Circle(puChapel, getString(R.string.Providence_Chapel));
-        addMarker_Circle(artCenter, getString(R.string.Art_Center));
-        addMarker_Circle(sportHall, getString(R.string.Sport_Hall));
-        addMarker_Circle(loverBridge, getString(R.string.Lover_Bridge));
-        addMarker_Circle(swimmingPool, getString(R.string.Swimming_Pool));
+        addMarker_Circle(rome, getString(R.string.Rome), 20);
+        addMarker_Circle(walkway, getString(R.string.Cherry_Blossom_Walkway), 20);
+        addMarker_Circle(library, getString(R.string.Library), 20);
+        addMarker_Circle(bigLawn, getString(R.string.Big_Lawn), 20);
+        addMarker_Circle(fountain, getString(R.string.Fountain), 20);
+        addMarker_Circle(puChapel, getString(R.string.Providence_Chapel), 20);
+        addMarker_Circle(artCenter, getString(R.string.Art_Center), 20);
+        addMarker_Circle(sportHall, getString(R.string.Sport_Hall), 20);
+        addMarker_Circle(loverBridge, getString(R.string.Lover_Bridge), 20);
+        addMarker_Circle(swimmingPool, getString(R.string.Swimming_Pool), 20);
 
         // 限定縮放級別 和 地圖平移限制
-        gMap.setMinZoomPreference(15);
+        gMap.setMinZoomPreference(16);
         gMap.setMaxZoomPreference(19);
         gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(puBounds, 0));
         gMap.setLatLngBoundsForCameraTarget(puBounds);
     }
 
-    private void addMarker_Circle(LatLng latLng, String title) {
+    private void addMarker_Circle(LatLng latLng, String title, int radius) {
         gMap.addMarker(new MarkerOptions()
                 .position(latLng)
                 .title(title));
         gMap.addCircle(new CircleOptions()
                 .center(latLng)
-                .radius(20)
+                .radius(radius)
                 .strokeColor(getColor(R.color.strokeWidth))
                 .fillColor(getColor(R.color.fillStroke))
                 .strokeWidth(5));
