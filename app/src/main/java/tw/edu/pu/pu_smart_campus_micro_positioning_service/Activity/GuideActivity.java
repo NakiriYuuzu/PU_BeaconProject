@@ -5,15 +5,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteException;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,7 +18,6 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.airbnb.lottie.L;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -30,41 +26,30 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
-import com.google.android.material.textview.MaterialTextView;
 import com.permissionx.guolindev.PermissionX;
 
 import org.altbeacon.beacon.Beacon;
-import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.Identifier;
-import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconDefine;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Database.DBHelper;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 
-public class GuideActivity extends AppCompatActivity implements BeaconConsumer, OnMapReadyCallback {
+public class GuideActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private final String TAG = "SafetyActivity: ";
 
     private static final long DEFAULT_FOREGROUND_SCAN_PERIOD = 500L; // half sec
     private static final long DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD = 500L; // half sec
-
-    private final float DISTANCE_THRESHOLD = 3f;
-    private final float DISTANCE_THRESHOLD_DATA = 1.5f;
 
     private boolean beaconIsRunning = false;
 
@@ -73,13 +58,7 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
     private BeaconManager beaconManager;
     private BeaconDefine beaconDefine;
 
-    private MaterialButton btnStart, btnStop;
-    private MaterialTextView tvShowDisplay;
     private ShapeableImageView btnBack;
-
-    private ArrayList<HashMap<String, String>> beaconMap = new ArrayList<>();
-    private HashMap<String, Integer> regionMap = new HashMap<>();
-    private ArrayList<Beacon> beaconList = new ArrayList<>();
 
     private String TmpMajor;
     private String TmpMinor;
@@ -94,7 +73,6 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
             String Message = objBundle.getString("MSG_key");
 
             Log.e("Message", Message);
-            tvShowDisplay.setText(Message);
             showAlert(Message);
         }
     };
@@ -108,6 +86,7 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
         setContentView(R.layout.activity_guide);
 
         initView();
+        buttonInit();
         requestPermission();
         requestBluetooth();
         beaconInit();
@@ -124,31 +103,11 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
         beaconManager.setForegroundBetweenScanPeriod(DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD);
         beaconManager.setForegroundScanPeriod(DEFAULT_FOREGROUND_SCAN_PERIOD);
 
-        beaconIsRunning = true;
-
-        beaconManager.bind(this);
+        startScanning();
     }
 
     private void buttonInit() {
-        btnBack.setOnClickListener(v -> {
-            finish();
-        });
-
-        btnStart.setOnClickListener(v -> {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    beaconInit();
-                }
-            }).start();
-        });
-
-        btnStop.setOnClickListener(v -> {
-            if (beaconIsRunning) {
-                beaconManager.removeAllRangeNotifiers();
-                beaconIsRunning = false;
-            }
-        });
+        btnBack.setOnClickListener(v -> finish());
     }
 
     private void initView() {
@@ -228,41 +187,31 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
         DB.insertSpotData(sport_hall_name, sport_hall_info, sport_hall_url);
     }
 
-    @Override
-    public void onBeaconServiceConnect() {
+    private void startScanning() {
         beaconManager.removeAllMonitorNotifiers();
         beaconManager.removeAllRangeNotifiers();
 
-        beaconManager.addRangeNotifier(new RangeNotifier() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void didRangeBeaconsInRegion(Collection<Beacon> collection, Region region) {
-                if (collection.size() > 0) {
-                    List<Beacon> beacons = new ArrayList<>();
-                    for (Beacon beaconData : collection) {
-                        if (beaconData.getDistance() <= 30) {
-                            beacons.add(beaconData);
-                            Log.e("Beacon", beaconDefine.getLocationMsg(String.valueOf(beaconData.getId2()), String.valueOf(beaconData.getId3())));
+        beaconManager.addRangeNotifier((collection, region) -> {
+            if (collection.size() > 0) {
+                List<Beacon> beacons = new ArrayList<>();
+                for (Beacon beaconData : collection) {
+                    if (beaconData.getDistance() <= 30) {
+                        beacons.add(beaconData);
+                        Log.e("Beacon", beaconDefine.getLocationMsg(String.valueOf(beaconData.getId2()), String.valueOf(beaconData.getId3())));
+                    }
+                }
+
+                if (beacons.size() > 0) {
+
+                    Collections.sort(beacons, new Comparator<Beacon>() {
+                        @Override
+                        public int compare(Beacon o1, Beacon o2) {
+                            return Double.compare(o2.getDistance(), o1.getDistance());
                         }
-                    }
+                    });
 
-                    if (beacons.size() > 0) {
-
-                        Collections.sort(beacons, new Comparator<Beacon>() {
-                            @Override
-                            public int compare(Beacon o1, Beacon o2) {
-                                // Rssi 判斷
-                                //return o2.getRssi() - o1.getRssi();
-
-                                //Distance 判斷
-                                return Double.compare(o2.getDistance(), o1.getDistance());
-                            }
-                        });
-
-                        Beacon beacon = beacons.get(0);
-                        Log.e("Should show Alert", String.valueOf(shouldShowAlert));
-                        showData(beacon);
-                    }
+                    Beacon beacon = beacons.get(0);
+                    showData(beacon);
                 }
             }
         });
@@ -299,23 +248,12 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
 
                 if (TmpMajor.equals(major) && TmpMinor.equals(minor)) {
                     if (shouldShowAlert) {
-                        String str;
+                        String str = beaconDefine.getLocationMsg(major, minor);
 
-                        switch (beaconDefine.getLocationMsg(major, minor)) {
-                            case "IBEACON_10":
-                                str = String.format("主顧聖母堂");
-                                objBundle.putString("MSG_key", str);
-                                objMessage.setData(objBundle);
-                                shouldShowAlert = false;
-                                break;
-                            case "IBEACON_11":
-                                str = String.format("主顧樓");
-                                objBundle.putString("MSG_key", str);
-                                objMessage.setData(objBundle);
-                                shouldShowAlert = false;
-                                break;
-                            case "IBEACON_21":
-                                str = String.format("若望保祿二世體育館");
+                        switch (str) {
+                            case "主顧聖母堂":
+                            case "主顧樓":
+                            case "若望保祿二世體育館":
                                 objBundle.putString("MSG_key", str);
                                 objMessage.setData(objBundle);
                                 shouldShowAlert = false;
@@ -338,29 +276,23 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
     }
 
     private boolean firstTimeCheck() {
-        if (TmpMajor == null && TmpMinor == null)
-            return true;
-        else
-            return false;
+        return TmpMajor == null && TmpMinor == null;
     }
 
     private void showAlert(String str) {
         AlertDialog dlg = new AlertDialog.Builder(GuideActivity.this)
                 .setTitle("Testing")
                 .setMessage(str)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (str) {
-                            case "主顧聖母堂":
-                            case "主顧樓":
-                            case "若望保祿二世體育館":
-                                intentToGuideSpot(str);
-                                Log.e(TAG, "onClick: " + str);
-                                break;
-                        }
-                        dialog.dismiss();
+                .setPositiveButton("OK", (dialog, which) -> {
+                    switch (str) {
+                        case "主顧聖母堂":
+                        case "主顧樓":
+                        case "若望保祿二世體育館":
+                            intentToGuideSpot(str);
+                            Log.e(TAG, "onClick: " + str);
+                            break;
                     }
+                    dialog.dismiss();
                 })
                 .create();
         dlg.show();
@@ -381,7 +313,6 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
     protected void onDestroy() {
         super.onDestroy();
         if (beaconIsRunning) {
-            beaconManager.unbind(this);
             beaconManager.removeAllRangeNotifiers();
 
             beaconIsRunning = false;
