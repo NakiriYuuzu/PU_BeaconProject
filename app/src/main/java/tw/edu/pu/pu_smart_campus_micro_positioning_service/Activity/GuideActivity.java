@@ -60,8 +60,8 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
 
     private final String TAG = "SafetyActivity: ";
 
-    private static final long DEFAULT_FOREGROUND_SCAN_PERIOD = 500L; // half sec
-    private static final long DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD = 500L; // half sec
+    private static final long DEFAULT_FOREGROUND_SCAN_PERIOD = 1000L; // half sec
+    private static final long DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD = 1000L; // half sec
 
     private final float DISTANCE_THRESHOLD = 3f;
     private final float DISTANCE_THRESHOLD_DATA = 1.5f;
@@ -130,9 +130,7 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
     }
 
     private void buttonInit() {
-        btnBack.setOnClickListener(v -> {
-            finish();
-        });
+        btnBack.setOnClickListener(v -> finish());
 
         btnStart.setOnClickListener(v -> {
             new Thread(new Runnable() {
@@ -237,6 +235,7 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
             @SuppressLint("SetTextI18n")
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> collection, Region region) {
+                Log.e(TAG, "SCANNING!\nBeaconDATA: " + collection.size());
                 if (collection.size() > 0) {
                     List<Beacon> beacons = new ArrayList<>();
                     for (Beacon beaconData : collection) {
@@ -268,8 +267,7 @@ public class GuideActivity extends AppCompatActivity implements BeaconConsumer, 
         });
 
         try {
-            beaconManager.startRangingBeacons(new Region("Beacon", Identifier.parse("699ebc80-e1f3-11e3-9a0f-0cf3ee3bc012"), null, null));
-            beaconManager.startRangingBeacons(new Region("IPhone", Identifier.parse("594650a2-8621-401f-b5de-6eb3ee398170"), null, null));
+            beaconManager.startRangingBeacons(new Region("Beacon", null, null, null));
 
         } catch (Exception e) {
             e.printStackTrace();

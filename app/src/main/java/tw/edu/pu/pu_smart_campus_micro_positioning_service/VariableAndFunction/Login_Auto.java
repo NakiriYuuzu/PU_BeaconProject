@@ -9,32 +9,32 @@ import android.preference.PreferenceManager;
 
 public class Login_Auto {
 
-    public Login_Auto() {
+    private final Context context;
 
+    public Login_Auto(Context context) {
+        this.context = context;
     }
 
-    public static boolean saveID(String id, Context context) {
+    public void saveID(String id) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(KEY_ID, id);
         editor.apply();
-        return true;
     }
 
-    public static String getID(Context context) {
+    public String getID() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         return preferences.getString(KEY_ID, null);
     }
 
-    public static boolean savePassword(String password, Context context) {
+    public void savePassword(String password) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(KEY_PASSWORD, password);
         editor.apply();
-        return true;
     }
 
-    public static String getPassword(Context context) {
+    public String getPassword() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         return preferences.getString(KEY_PASSWORD, null);
     }
