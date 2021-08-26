@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
@@ -25,6 +26,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.permissionx.guolindev.PermissionX;
@@ -33,9 +35,11 @@ import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.Identifier;
+import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -64,6 +68,7 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
     private String TmpMinor;
     private boolean shouldShowAlert = true;
 
+    @SuppressLint("HandlerLeak")
     Handler objHandler = new Handler() {
 
         @Override
@@ -76,7 +81,6 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
             showAlert(Message);
         }
     };
-
 
     private DBHelper DB;
 
@@ -115,9 +119,13 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
         btnBack = findViewById(R.id.btn_Guide_back);
         beaconDefine = new BeaconDefine();
 
+        buttonInit();
+
         // Google Maps findView
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView);
-        mapFragment.getMapAsync(this);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
     }
 
     private void requestPermission() {
@@ -191,38 +199,43 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
         beaconManager.removeAllMonitorNotifiers();
         beaconManager.removeAllRangeNotifiers();
 
-        beaconManager.addRangeNotifier((collection, region) -> {
-            if (collection.size() > 0) {
-                List<Beacon> beacons = new ArrayList<>();
-                for (Beacon beaconData : collection) {
-                    if (beaconData.getDistance() <= 30) {
-                        beacons.add(beaconData);
-                        Log.e("Beacon", beaconDefine.getLocationMsg(String.valueOf(beaconData.getId2()), String.valueOf(beaconData.getId3())));
+        beaconManager.addRangeNotifier(new RangeNotifier() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void didRangeBeaconsInRegion(Collection<Beacon> collection, Region region) {
+                Log.e(TAG, "SCANNING!\nBeaconDATA: " + collection.size());
+                if (collection.size() > 0) {
+                    List<Beacon> beacons = new ArrayList<>();
+                    for (Beacon beaconData : collection) {
+                        if (beaconData.getDistance() <= 30) {
+                            beacons.add(beaconData);
+                            Log.e("Beacon", beaconDefine.getLocationMsg(String.valueOf(beaconData.getId2()), String.valueOf(beaconData.getId3())));
+                        }
+
+                        if (beacons.size() > 0) {
+
+                            Collections.sort(beacons, new Comparator<Beacon>() {
+                                @Override
+                                public int compare(Beacon o1, Beacon o2) {
+                                    return Double.compare(o2.getDistance(), o1.getDistance());
+                                }
+                            });
+
+                            Beacon beacon = beacons.get(0);
+                            Log.e("Should show Alert", String.valueOf(shouldShowAlert));
+                            showData(beacon);
+                        }
                     }
                 }
 
-                if (beacons.size() > 0) {
+                try {
+                    beaconManager.startRangingBeacons(new Region("Beacon", null, null, null));
 
-                    Collections.sort(beacons, new Comparator<Beacon>() {
-                        @Override
-                        public int compare(Beacon o1, Beacon o2) {
-                            return Double.compare(o2.getDistance(), o1.getDistance());
-                        }
-                    });
-
-                    Beacon beacon = beacons.get(0);
-                    showData(beacon);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         });
-
-        try {
-            beaconManager.startRangingBeacons(new Region("Beacon", Identifier.parse("699ebc80-e1f3-11e3-9a0f-0cf3ee3bc012"), null, null));
-            beaconManager.startRangingBeacons(new Region("IPhone", Identifier.parse("594650a2-8621-401f-b5de-6eb3ee398170"), null, null));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     private void showData(Beacon beacon) {
@@ -257,17 +270,14 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
                                 objBundle.putString("MSG_key", str);
                                 objMessage.setData(objBundle);
                                 shouldShowAlert = false;
-                                break;
+                                objHandler.sendMessage(objMessage);
                         }
-
-                        objHandler.sendMessage(objMessage);
+                    } else {
+                        shouldShowAlert = true;
+                        TmpMajor = major;
+                        TmpMinor = minor;
                     }
-                } else {
-                    shouldShowAlert = true;
-                    TmpMajor = major;
-                    TmpMinor = minor;
                 }
-
             }
         };
 
@@ -299,14 +309,12 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
     }
 
     private void intentToGuideSpot(String str) {
-
         Intent intent = new Intent();
         intent.setClass(GuideActivity.this, GuideSpotActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString("Key", str);
         intent.putExtras(bundle);
         startActivity(intent);
-
     }
 
     @Override
@@ -347,14 +355,14 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
         // 在地圖添加標點 和 設置標點的範圍
         addMarker_Circle(rome, getString(R.string.Rome), 20);
         addMarker_Circle(walkway, getString(R.string.Cherry_Blossom_Walkway), 20);
-        addMarker_Circle(library, getString(R.string.Library), 20);
-        addMarker_Circle(bigLawn, getString(R.string.Big_Lawn), 20);
-        addMarker_Circle(fountain, getString(R.string.Fountain), 20);
-        addMarker_Circle(puChapel, getString(R.string.Providence_Chapel), 20);
+        addMarker_Circle(library, getString(R.string.Library), 35);
+        addMarker_Circle(bigLawn, getString(R.string.Big_Lawn), 50);
+        addMarker_Circle(fountain, getString(R.string.Fountain), 15);
+        addMarker_Circle(puChapel, getString(R.string.Providence_Chapel), 25);
         addMarker_Circle(artCenter, getString(R.string.Art_Center), 20);
-        addMarker_Circle(sportHall, getString(R.string.Sport_Hall), 20);
+        addMarker_Circle(sportHall, getString(R.string.Sport_Hall), 40);
         addMarker_Circle(loverBridge, getString(R.string.Lover_Bridge), 20);
-        addMarker_Circle(swimmingPool, getString(R.string.Swimming_Pool), 20);
+        addMarker_Circle(swimmingPool, getString(R.string.Swimming_Pool), 25);
 
         // 限定縮放級別 和 地圖平移限制
         gMap.setMinZoomPreference(16);
@@ -364,9 +372,13 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
     }
 
     private void addMarker_Circle(LatLng latLng, String title, int radius) {
-        gMap.addMarker(new MarkerOptions()
+        Marker marker = gMap.addMarker(new MarkerOptions()
                 .position(latLng)
                 .title(title));
+        if (marker != null) {
+            marker.showInfoWindow();
+        }
+
         gMap.addCircle(new CircleOptions()
                 .center(latLng)
                 .radius(radius)

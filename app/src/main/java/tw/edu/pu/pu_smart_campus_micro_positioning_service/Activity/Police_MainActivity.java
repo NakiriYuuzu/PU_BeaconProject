@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +16,7 @@ import com.google.android.material.textview.MaterialTextView;
 import com.permissionx.guolindev.PermissionX;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.Login_Auto;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestItem;
 
 public class Police_MainActivity extends AppCompatActivity {
@@ -29,6 +29,7 @@ public class Police_MainActivity extends AppCompatActivity {
     private String users;
 
     RequestItem permissionRequest;
+    Login_Auto loginAuto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,13 +53,14 @@ public class Police_MainActivity extends AppCompatActivity {
         userNames = findViewById(R.id.userNames);
 
         permissionRequest = new RequestItem(this);
+        loginAuto = new Login_Auto(this);
     }
 
     private void initData() {
         Intent intent = getIntent();
         if (intent != null) {
             users = intent.getStringExtra("users");
-            role = intent.getIntExtra("role", 0);
+            role = intent.getIntExtra("role", 99);
         }
 
         userNames.setText(users);
@@ -97,10 +99,8 @@ public class Police_MainActivity extends AppCompatActivity {
         });
 
         btnSignOut.setOnClickListener(v -> {
-            SharedPreferences preferences = getSharedPreferences("checkBox", MODE_PRIVATE);
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putString("remember", "false");
-            editor.apply();
+            loginAuto.saveID("");
+            loginAuto.savePassword("");
             finish();
         });
     }

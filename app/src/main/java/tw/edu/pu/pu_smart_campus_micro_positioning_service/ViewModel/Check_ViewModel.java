@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class check_ViewModel extends ViewModel {
+public class Check_ViewModel extends ViewModel {
     private final MutableLiveData<String> titleName = new MutableLiveData<>();
     private final MutableLiveData<Integer> totalPPL = new MutableLiveData<>();
     private final MutableLiveData<Integer> locationImage = new MutableLiveData<>();

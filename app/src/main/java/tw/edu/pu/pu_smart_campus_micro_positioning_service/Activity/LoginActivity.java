@@ -2,19 +2,15 @@ package tw.edu.pu.pu_smart_campus_micro_positioning_service.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.Toast;
 
-import com.android.volley.NetworkResponse;
 import com.android.volley.VolleyError;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -25,6 +21,7 @@ import org.json.JSONObject;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect.VolleyApi;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.Login_Auto;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestItem;
 
 public class LoginActivity extends AppCompatActivity {
@@ -36,6 +33,7 @@ public class LoginActivity extends AppCompatActivity {
     private CheckBox btnRememberMe;
 
     RequestItem requestItem;
+    Login_Auto loginAuto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,16 +43,19 @@ public class LoginActivity extends AppCompatActivity {
         if (!(requestNetworkConnection())) {
             Toast.makeText(getApplicationContext(), "請打開網絡後，再打開APP.", Toast.LENGTH_SHORT).show();
 
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    finish();
-                }
-            }, 3500);
+            new Handler().postDelayed(this::finish, 3500);
 
         } else {
             viewInit();
             buttonInit();
+
+            Log.e(TAG + "used", loginAuto.getID() + loginAuto.getPassword());
+
+            if (loginAuto.getID() != null && loginAuto.getPassword()!= null) {
+                if (!loginAuto.getID().equals("") && !loginAuto.getPassword().equals("")) {
+                    autoLoginFunction();
+                }
+            }
         }
     }
 
@@ -67,40 +68,6 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(v -> loginFunction());
 
         btnGuest.setOnClickListener(v -> guestFunction());
-
-        SharedPreferences preferences = getSharedPreferences("checkBox", MODE_PRIVATE);
-        String checkBox = preferences.getString("remember", "");
-
-        if (checkBox.equals("true")) {
-            Toast.makeText(getApplicationContext(), "Sign in Successfully!", Toast.LENGTH_SHORT).show();
-            Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
-            startActivity(ii);
-
-        } else if (checkBox.equals("false")) {
-            Toast.makeText(getApplicationContext(), "Please Sign In.", Toast.LENGTH_SHORT).show();
-        }
-
-        btnRememberMe.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (buttonView.isChecked()) {
-                    SharedPreferences preferences = getSharedPreferences("checkBox", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putString("remember", "true");
-                    editor.apply();
-
-                    Log.e("checkBox", "checked.");
-
-                } else if (!buttonView.isChecked()) {
-                    SharedPreferences preferences = getSharedPreferences("checkBox", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putString("remember", "false");
-                    editor.apply();
-
-                    Log.e("checkBox", "unchecked.");
-                }
-            }
-        });
     }
 
     private void viewInit() {
@@ -111,26 +78,61 @@ public class LoginActivity extends AppCompatActivity {
         btnRememberMe = findViewById(R.id.checkBox_rememberMe);
 
         requestItem = new RequestItem(this);
+        loginAuto = new Login_Auto(this);
     }
 
-    @SuppressLint("HardwareIds")
+    private void guestFunction() {
+        VolleyApi volleyApi = new VolleyApi(this, "http://120.110.93.246/CAMEFSC1/public/api/login/tourist");
+        volleyApi.post_API_Login_Guest(requestItem.requestIMEI(), new VolleyApi.VolleyCallback() {
+            @Override
+            public void onSuccess(String result) {
+                Log.e("guest_success", result);
+
+                try {
+                    JSONObject jsonData = new JSONObject(result);
+                    String token = jsonData.getString("token");
+                    String users = "tourist";
+
+                    Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
+                    ii.putExtra("tokens", token);
+                    ii.putExtra("users", users);
+
+                    startActivity(ii);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailed(VolleyError error) {
+                Toast.makeText(getApplicationContext(), "認證失敗...", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void loginFunction() {
         if (etAcc.getText() != null && etPass.getText() != null) {
             String user = etAcc.getText().toString();
             String pass = etPass.getText().toString();
 
             if (user.equals("") || pass.equals("")) {
-                Toast.makeText(this, "Please enter all the fields!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "請輸入賬號與密碼!", Toast.LENGTH_SHORT).show();
 
             } else {
-                Log.e("Yuuzu", requestItem.requestIMEI());
-
                 VolleyApi volleyApi = new VolleyApi(LoginActivity.this, "http://120.110.93.246/CAMEFSC1/public/api/login/user");
 
                 volleyApi.post_API_Login(user, pass, new VolleyApi.VolleyCallback() {
                     @Override
                     public void onSuccess(String result) {
-                        Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, result);
+
+                        if (btnRememberMe.isChecked()) {
+                            loginAuto.saveID(user);
+                            loginAuto.savePassword(pass);
+                            Log.e(TAG + "save", loginAuto.getID() + loginAuto.getPassword());
+                        }
+
                         try {
                             JSONObject jsonData = new JSONObject(result);
                             String token = jsonData.getString("token");
@@ -162,51 +164,68 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
             }
-
-        } else {
-            Toast.makeText(this, "Please enter your account and password!", Toast.LENGTH_SHORT).show();
-
         }
     }
 
-    private void guestFunction() {
-//        Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
-//        startActivity(ii);
-        VolleyApi volleyApi = new VolleyApi(this, "http://120.110.93.246/CAMEFSC1/public/api/login/tourist");
-        volleyApi.post_API_Login_Guest(requestItem.requestIMEI(), new VolleyApi.VolleyCallback() {
-            @Override
-            public void onSuccess(String result) {
-                JSONObject jsonData = null;
-                try {
-                    jsonData = new JSONObject(result);
-                    String token = jsonData.getString("token");
-                    String users = "tourist";
+    private void autoLoginFunction() {
+        try {
+            String id = loginAuto.getID();
+            String pass = loginAuto.getPassword();
 
-                    Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
-                    ii.putExtra("tokens", token);
-                    ii.putExtra("users", users);
 
-                    startActivity(ii);
+            VolleyApi volleyApi = new VolleyApi(LoginActivity.this, "http://120.110.93.246/CAMEFSC1/public/api/login/user");
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
+            volleyApi.post_API_Login(id, pass, new VolleyApi.VolleyCallback() {
+                @Override
+                public void onSuccess(String result) {
+                    Log.e(TAG, result);
 
-            @Override
-            public void onFailed(VolleyError error) {
-                try {
-                    if (error.networkResponse.statusCode == 400) {
-                        Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
+                    try {
+                        JSONObject jsonData = new JSONObject(result);
+                        String token = jsonData.getString("token");
+                        String users = jsonData.getString("name");
+                        int role = jsonData.getInt("role");
 
-                    } else {
-                        Toast.makeText(getApplicationContext(), "連接伺服器失敗", Toast.LENGTH_SHORT).show();
+                        Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
+                        ii.putExtra("tokens", token);
+                        ii.putExtra("users", users);
+                        ii.putExtra("role", role);
+
+                        Toast.makeText(getApplicationContext(), "登入成功", Toast.LENGTH_SHORT).show();
+
+                        startActivity(ii);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
-            }
-        });
+
+                @Override
+                public void onFailed(VolleyError error) {
+                    try {
+                        loginAuto.saveID("");
+                        loginAuto.savePassword("");
+                        Toast.makeText(getApplicationContext(), "自動登入失敗，請重新登入...", Toast.LENGTH_SHORT).show();
+
+                    }catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!(requestNetworkConnection())) {
+            Toast.makeText(getApplicationContext(), "請打開網絡後，再打開APP.", Toast.LENGTH_SHORT).show();
+
+            new Handler().postDelayed(this::finish, 3500);
+
+        }
     }
 }
