@@ -66,7 +66,10 @@ public class SafetyActivity extends AppCompatActivity {
     }
 
     private void initButton() {
-        btnBack.setOnClickListener(v -> finish());
+        btnBack.setOnClickListener(v -> {
+            stopScanning();
+            finish();
+        });
 
         btnSafety.setOnClickListener(v -> {
             if (!animationRunning) {

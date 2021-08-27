@@ -95,43 +95,45 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void guestFunction() {
-        VolleyApi volleyApi = new VolleyApi(this, "http://120.110.93.246/CAMEFSC1/public/api/login/tourist");
-        volleyApi.post_API_Login_Guest(requestItem.requestIMEI(), new VolleyApi.VolleyCallback() {
-            @Override
-            public void onSuccess(String result) {
-                Log.e("guest_success", result);
-
-                try {
-                    JSONObject jsonData = new JSONObject(result);
-                    String token = jsonData.getString("token");
-                    String users = "tourist";
-
-                    Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
-                    ii.putExtra("tokens", token);
-                    ii.putExtra("users", users);
-
-                    guestLoginChecked = false;
-
-                    startActivity(ii);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    guestLoginChecked = false;
-                }
-            }
-
-            @Override
-            public void onFailed(VolleyError error) {
-                try {
-                    Toast.makeText(getApplicationContext(), "認證失敗...", Toast.LENGTH_SHORT).show();
-                    guestLoginChecked = false;
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    guestLoginChecked = false;
-                }
-            }
-        });
+        Intent intent = new Intent(LoginActivity.this, Police_MainActivity.class);
+        startActivity(intent);
+//        VolleyApi volleyApi = new VolleyApi(this, "http://120.110.93.246/CAMEFSC1/public/api/login/tourist");
+//        volleyApi.post_API_Login_Guest(requestItem.requestIMEI(), new VolleyApi.VolleyCallback() {
+//            @Override
+//            public void onSuccess(String result) {
+//                Log.e("guest_success", result);
+//
+//                try {
+//                    JSONObject jsonData = new JSONObject(result);
+//                    String token = jsonData.getString("token");
+//                    String users = "tourist";
+//
+//                    Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
+//                    ii.putExtra("tokens", token);
+//                    ii.putExtra("users", users);
+//
+//                    guestLoginChecked = false;
+//
+//                    startActivity(ii);
+//
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                    guestLoginChecked = false;
+//                }
+//            }
+//
+//            @Override
+//            public void onFailed(VolleyError error) {
+//                try {
+//                    Toast.makeText(getApplicationContext(), "認證失敗...", Toast.LENGTH_SHORT).show();
+//                    guestLoginChecked = false;
+//
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                    guestLoginChecked = false;
+//                }
+//            }
+//        });
     }
 
     private void loginFunction() {

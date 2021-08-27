@@ -43,6 +43,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.TimerTask;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconDefine;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Database.DBHelper;
@@ -51,12 +52,10 @@ import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.R
 
 public class GuideActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private final String TAG = "SafetyActivity: ";
+    private final String TAG = "GuideActivity: ";
 
     private static final long DEFAULT_FOREGROUND_SCAN_PERIOD = 1000L;
     private static final long DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD = 1000L;
-
-    private boolean beaconIsRunning = false;
 
     private GoogleMap gMap;
 
@@ -107,12 +106,19 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
 
         beaconManager.setForegroundBetweenScanPeriod(DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD);
         beaconManager.setForegroundScanPeriod(DEFAULT_FOREGROUND_SCAN_PERIOD);
-
-        startScanning();
+        new Handler().postDelayed(new TimerTask() {
+            @Override
+            public void run() {
+                startScanning();
+            }
+        }, 3000);
     }
 
     private void buttonInit() {
-        btnBack.setOnClickListener(v -> finish());
+        btnBack.setOnClickListener(v -> {
+            stopScanning();
+            finish();
+        });
     }
 
     private void initView() {
@@ -120,8 +126,6 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
         btnBack = findViewById(R.id.btn_Guide_back);
         beaconDefine = new BeaconDefine();
         requestItem = new RequestItem(this);
-
-        buttonInit();
 
         // Google Maps findView
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView);
@@ -153,43 +157,46 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
         beaconManager.removeAllMonitorNotifiers();
         beaconManager.removeAllRangeNotifiers();
 
-        beaconManager.addRangeNotifier(new RangeNotifier() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void didRangeBeaconsInRegion(Collection<Beacon> collection, Region region) {
-                Log.e(TAG, "SCANNING!\nBeaconDATA: " + collection.size());
-                if (collection.size() > 0) {
-                    List<Beacon> beacons = new ArrayList<>();
-                    for (Beacon beaconData : collection) {
-                        if (beaconData.getDistance() <= 30) {
-                            beacons.add(beaconData);
-                            Log.e("Beacon", beaconDefine.getLocationMsg(String.valueOf(beaconData.getId2()), String.valueOf(beaconData.getId3())));
-                        }
+        Log.e(TAG, "startScanning...");
+        beaconManager.addRangeNotifier((collection, region) -> {
+            Log.e(TAG, "SCANNING!\nBeaconDATA: " + collection.size());
+            if (collection.size() > 0) {
+                List<Beacon> beacons = new ArrayList<>();
+                for (Beacon beaconData : collection) {
+                    if (beaconData.getDistance() <= 30) {
+                        beacons.add(beaconData);
+                        Log.e("Beacon", beaconDefine.getLocationMsg(String.valueOf(beaconData.getId2()), String.valueOf(beaconData.getId3())));
+                    }
 
-                        if (beacons.size() > 0) {
+                    if (beacons.size() > 0) {
 
-                            Collections.sort(beacons, new Comparator<Beacon>() {
-                                @Override
-                                public int compare(Beacon o1, Beacon o2) {
-                                    return Double.compare(o2.getDistance(), o1.getDistance());
-                                }
-                            });
+                        Collections.sort(beacons, new Comparator<Beacon>() {
+                            @Override
+                            public int compare(Beacon o1, Beacon o2) {
+                                return Double.compare(o2.getDistance(), o1.getDistance());
+                            }
+                        });
 
-                            Beacon beacon = beacons.get(0);
-                            Log.e("Should show Alert", String.valueOf(shouldShowAlert));
-                            showData(beacon);
-                        }
+                        Beacon beacon = beacons.get(0);
+                        Log.e("Should show Alert", String.valueOf(shouldShowAlert));
+                        showData(beacon);
                     }
                 }
-
-                try {
-                    beaconManager.startRangingBeacons(new Region("Beacon", null, null, null));
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            } else {
+                Log.e("BeaconMsg", "didRangeBeaconsInRegion: No Beacon detected");
             }
         });
+
+        try {
+            beaconManager.startRangingBeacons(new Region("Beacon", Identifier.parse("699ebc80-e1f3-11e3-9a0f-0cf3ee3bc012"), null, null));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void stopScanning() {
+        beaconManager.removeAllRangeNotifiers();
     }
 
     private void showData(Beacon beacon) {
@@ -274,11 +281,7 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (beaconIsRunning) {
-            beaconManager.removeAllRangeNotifiers();
-
-            beaconIsRunning = false;
-        }
+        beaconManager.removeAllRangeNotifiers();
     }
 
     @Override

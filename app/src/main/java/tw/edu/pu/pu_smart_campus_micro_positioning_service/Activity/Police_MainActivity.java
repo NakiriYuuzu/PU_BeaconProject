@@ -60,7 +60,7 @@ public class Police_MainActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null) {
             users = intent.getStringExtra("users");
-            role = intent.getIntExtra("role", 0);
+            role = intent.getIntExtra("role", 99);
         }
 
         userNames.setText(users);
