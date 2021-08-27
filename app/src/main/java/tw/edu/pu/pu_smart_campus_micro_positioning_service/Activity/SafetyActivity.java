@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 
@@ -14,11 +15,9 @@ import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.Identifier;
-import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -67,12 +66,15 @@ public class SafetyActivity extends AppCompatActivity {
     }
 
     private void initButton() {
-        btnBack.setOnClickListener(v -> {
-            finish();
-        });
+        btnBack.setOnClickListener(v -> finish());
 
         btnSafety.setOnClickListener(v -> {
             if (!animationRunning) {
+                MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(this);
+                materialAlertDialogBuilder.setTitle("安全通道");
+                materialAlertDialogBuilder.setMessage("啓動此功能會實時偵測您所在的位置");
+
+
                 animationStart();
 
             } else {
@@ -111,56 +113,53 @@ public class SafetyActivity extends AppCompatActivity {
     private void startScanning() {
         beaconManager.removeAllMonitorNotifiers();
         beaconManager.removeAllRangeNotifiers();
-        beaconManager.addRangeNotifier(new RangeNotifier() {
-            @Override
-            public void didRangeBeaconsInRegion(Collection<Beacon> beaconCollection, Region region) {
-                if (beaconCollection.size() > 0) {
-                    count_Alert = 0;
-                    firstChecked = false;
-                    Log.e(TAG, "Success Get data");
-                    List<Beacon> beacons = new ArrayList<>();
-                    for (Beacon beacon : beaconCollection) {
-                        beacons.add(beacon);
+        beaconManager.addRangeNotifier((beaconCollection, region) -> {
+            if (beaconCollection.size() > 0) {
+                count_Alert = 0;
+                firstChecked = false;
+                Log.e(TAG, "Success Get data");
+                List<Beacon> beacons = new ArrayList<>();
+                for (Beacon beacon : beaconCollection) {
+                    beacons.add(beacon);
+                }
+
+                if (beacons.size() > 0) {
+                    Collections.sort(beacons, new Comparator<Beacon>() {
+                        @Override
+                        public int compare(Beacon o1, Beacon o2) {
+                            return Double.compare(o2.getDistance(), o1.getDistance());
+                        }
+                    });
+
+                    apiTimer();
+                    if (beacons.size() > 1) {
+                        beaconStore = new BeaconStore(beacons.get(0), beacons.get(1));
+                        beaconStore.beaconData(apiChecked);
                     }
 
-                    if (beacons.size() > 0) {
-                        Collections.sort(beacons, new Comparator<Beacon>() {
-                            @Override
-                            public int compare(Beacon o1, Beacon o2) {
-                                return Double.compare(o2.getDistance(), o1.getDistance());
+                    else if (beacons.size() == 1) {
+                        beaconStore = new BeaconStore(beacons.get(0));
+                        beaconStore.beaconData(apiChecked);
+                    }
+                }
+
+            } else {
+                Log.e(TAG, "NO Beacon here.");
+                if (firstChecked) {
+                    Log.e(TAG, "Alert! 此道路暫時不支援安全通道。");
+                    count_Animation++;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (count_Animation == 4) {
+                                animationStop();
+                                count_Animation = 0;
                             }
-                        });
-
-                        apiTimer();
-                        if (beacons.size() > 1) {
-                            beaconStore = new BeaconStore(beacons.get(0), beacons.get(1));
-                            beaconStore.beaconData(apiChecked);
                         }
-
-                        else if (beacons.size() == 1) {
-                            beaconStore = new BeaconStore(beacons.get(0));
-                            beaconStore.beaconData(apiChecked);
-                        }
-                    }
+                    });
 
                 } else {
-                    Log.e(TAG, "NO Beacon here.");
-                    if (firstChecked) {
-                        Log.e(TAG, "Alert! 此道路暫時不支援安全通道。");
-                        count_Animation++;
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (count_Animation == 4) {
-                                    animationStop();
-                                    count_Animation = 0;
-                                }
-                            }
-                        });
-
-                    } else {
-                        dialogTimer();
-                    }
+                    dialogTimer();
                 }
             }
         });
