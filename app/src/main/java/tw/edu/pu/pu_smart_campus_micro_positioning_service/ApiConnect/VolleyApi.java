@@ -48,13 +48,13 @@ public class VolleyApi {
                 callback.onFailed(error);
             }
         }) {
-//            @Override
-//            public Map<String, String> getHeaders() throws AuthFailureError {
-//                HashMap<String, String> headers = new HashMap<>();
-//                headers.put("Accept", "application/json");
-//                headers.put("Authorization", "Bearer + token");
-//                return headers;
-//            }
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Accept", "application/json");
+                headers.put("Authorization", "Bearer + token");
+                return headers;
+            }
         };
 
         requestQueue.add(stringRequest);
