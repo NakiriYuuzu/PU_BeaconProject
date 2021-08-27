@@ -2,11 +2,13 @@ package tw.edu.pu.pu_smart_campus_micro_positioning_service.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.android.volley.Request;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
@@ -17,9 +19,9 @@ import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.Region;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.TimerTask;
 
@@ -73,12 +75,7 @@ public class SafetyActivity extends AppCompatActivity {
 
         btnSafety.setOnClickListener(v -> {
             if (!animationRunning) {
-                MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(this);
-                materialAlertDialogBuilder.setTitle("安全通道");
-                materialAlertDialogBuilder.setMessage("啓動此功能會實時偵測您所在的位置");
-
-
-                animationStart();
+                showDialog("安全通道", "啓動此功能會實時偵測您所在的位置");
 
             } else {
                 animationStop();
@@ -87,12 +84,51 @@ public class SafetyActivity extends AppCompatActivity {
 
         btnSOS.setOnClickListener(v -> {
             if (!sosIsRunning) {
-                sos_Start();
+                MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(this);
+                materialAlertDialogBuilder.setTitle("安全通道SOS");
+                materialAlertDialogBuilder.setMessage("此功能會直接呼叫警衛室");
+                materialAlertDialogBuilder.setBackground(getResources().getDrawable(R.drawable.alert_dialog, null));
+                materialAlertDialogBuilder.setPositiveButton("OKAY", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        sos_Start();
+                        dialog.dismiss();
+                    }
+                });
+                materialAlertDialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                materialAlertDialogBuilder.show();
             }
             else {
                 sos_Stop();
             }
         });
+    }
+
+    private void showDialog(String title, String msg) {
+        MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(this);
+        materialAlertDialogBuilder.setTitle(title);
+        materialAlertDialogBuilder.setMessage(msg);
+        materialAlertDialogBuilder.setBackground(getResources().getDrawable(R.drawable.alert_dialog, null));
+        materialAlertDialogBuilder.setPositiveButton("OKAY", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                animationStart();
+                dialog.dismiss();
+            }
+        });
+        materialAlertDialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                animationStop();
+                dialog.dismiss();
+            }
+        });
+        materialAlertDialogBuilder.show();
     }
 
     private void initView() {
@@ -127,12 +163,7 @@ public class SafetyActivity extends AppCompatActivity {
                 }
 
                 if (beacons.size() > 0) {
-                    Collections.sort(beacons, new Comparator<Beacon>() {
-                        @Override
-                        public int compare(Beacon o1, Beacon o2) {
-                            return Double.compare(o2.getDistance(), o1.getDistance());
-                        }
-                    });
+                    Collections.sort(beacons, (o1, o2) -> Double.compare(o2.getDistance(), o1.getDistance()));
 
                     apiTimer();
                     if (beacons.size() > 1) {
@@ -155,6 +186,7 @@ public class SafetyActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             if (count_Animation == 4) {
+                                showDialog("安全通道", "此道路暫時不支援安全通道");
                                 animationStop();
                                 count_Animation = 0;
                             }

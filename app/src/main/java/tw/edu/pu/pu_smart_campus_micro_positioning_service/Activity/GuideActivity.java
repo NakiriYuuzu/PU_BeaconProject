@@ -6,12 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothManager;
-import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteException;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,6 +24,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.permissionx.guolindev.PermissionX;
 
@@ -35,18 +32,14 @@ import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.Identifier;
-import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.TimerTask;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconDefine;
-import tw.edu.pu.pu_smart_campus_micro_positioning_service.Database.DBHelper;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestItem;
 
@@ -83,8 +76,6 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
         }
     };
 
-    private DBHelper DB;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,12 +97,8 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
 
         beaconManager.setForegroundBetweenScanPeriod(DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD);
         beaconManager.setForegroundScanPeriod(DEFAULT_FOREGROUND_SCAN_PERIOD);
-        new Handler().postDelayed(new TimerTask() {
-            @Override
-            public void run() {
-                startScanning();
-            }
-        }, 3000);
+
+        startScanning();
     }
 
     private void buttonInit() {
@@ -170,12 +157,7 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
 
                     if (beacons.size() > 0) {
 
-                        Collections.sort(beacons, new Comparator<Beacon>() {
-                            @Override
-                            public int compare(Beacon o1, Beacon o2) {
-                                return Double.compare(o2.getDistance(), o1.getDistance());
-                            }
-                        });
+                        Collections.sort(beacons, (o1, o2) -> Double.compare(o2.getDistance(), o1.getDistance()));
 
                         Beacon beacon = beacons.get(0);
                         Log.e("Should show Alert", String.valueOf(shouldShowAlert));
@@ -215,7 +197,7 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
                     e.printStackTrace();
                 }
 
-                if (firstTimeCheck()) {
+                if (TmpMajor == null && TmpMinor == null) {
                     TmpMajor = major;
                     TmpMinor = minor;
                 }
@@ -228,9 +210,9 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
                             case "主顧聖母堂":
                             case "主顧樓":
                             case "若望保祿二世體育館":
+                                shouldShowAlert = false;
                                 objBundle.putString("MSG_key", str);
                                 objMessage.setData(objBundle);
-                                shouldShowAlert = false;
                                 objHandler.sendMessage(objMessage);
                         }
                     } else {
@@ -246,27 +228,26 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
         objBgThread.start();
     }
 
-    private boolean firstTimeCheck() {
-        return TmpMajor == null && TmpMinor == null;
-    }
-
     private void showAlert(String str) {
-        AlertDialog dlg = new AlertDialog.Builder(GuideActivity.this)
-                .setTitle("Testing")
-                .setMessage(str)
-                .setPositiveButton("OK", (dialog, which) -> {
-                    switch (str) {
-                        case "主顧聖母堂":
-                        case "主顧樓":
-                        case "若望保祿二世體育館":
-                            intentToGuideSpot(str);
-                            Log.e(TAG, "onClick: " + str);
-                            break;
-                    }
-                    dialog.dismiss();
-                })
-                .create();
-        dlg.show();
+        MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(this);
+        materialAlertDialogBuilder.setTitle("景點導覽");
+        materialAlertDialogBuilder.setMessage(str);
+        materialAlertDialogBuilder.setBackground(getResources().getDrawable(R.drawable.alert_dialog, null));
+        materialAlertDialogBuilder.setPositiveButton("OKAY", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (str) {
+                    case "主顧聖母堂":
+                    case "主顧樓":
+                    case "若望保祿二世體育館":
+                        intentToGuideSpot(str);
+                        Log.e(TAG, "onClick: " + str);
+                        break;
+                }
+                dialog.dismiss();
+            }
+        });
+        materialAlertDialogBuilder.show();
     }
 
     private void intentToGuideSpot(String str) {
