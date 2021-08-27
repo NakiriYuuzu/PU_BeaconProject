@@ -96,7 +96,6 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
         requestPermission();
         requestItem.requestBluetooth();
         beaconInit();
-        createSpotData();
     }
 
     private void beaconInit() {
@@ -148,32 +147,6 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
             Toast.makeText(getApplicationContext(), "您的手機無法使用該應用...", Toast.LENGTH_SHORT).show();
             finish();
         }
-    }
-
-    private void createSpotData() throws SQLiteException {
-        DB = new DBHelper(this);
-
-        // 從Resource裡拿資訊
-
-        // 主顧聖母堂
-        String pu_chapel_name = getResources().getString(R.string.Providence_Chapel);
-        String pu_chapel_info = getResources().getString(R.string.Providence_Chapel_Info);
-        String pu_chapel_url = getResources().getString(R.string.Providence_Chapel_Link);
-
-        // 主顧樓
-        String pu_hall_name = getResources().getString(R.string.Providence_Hall);
-        String pu_hall_info = getResources().getString(R.string.Providence_Hall_Info);
-        String pu_hall_url = getResources().getString(R.string.Providence_Hall_Link);
-
-        // 體育館
-        String sport_hall_name = getResources().getString(R.string.Sport_Hall);
-        String sport_hall_info = getResources().getString(R.string.Sport_hall_Info);
-        String sport_hall_url = getResources().getString(R.string.Sport_Hall_Link);
-
-        // 將資料依序存入資料庫
-        DB.insertSpotData(pu_chapel_name, pu_chapel_info, pu_chapel_url);
-        DB.insertSpotData(pu_hall_name, pu_hall_info, pu_hall_url);
-        DB.insertSpotData(sport_hall_name, sport_hall_info, sport_hall_url);
     }
 
     private void startScanning() {

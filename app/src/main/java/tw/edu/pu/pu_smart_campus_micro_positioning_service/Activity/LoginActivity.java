@@ -28,6 +28,9 @@ public class LoginActivity extends AppCompatActivity {
 
     private final String TAG = "Login Debug: ";
 
+    private boolean userLoginChecked = false;
+    private boolean guestLoginChecked = false;
+
     private TextInputEditText etAcc, etPass;
     private MaterialButton btnLogin, btnGuest;
     private CheckBox btnRememberMe;
@@ -51,7 +54,7 @@ public class LoginActivity extends AppCompatActivity {
 
             Log.e(TAG + "used", loginAuto.getID() + loginAuto.getPassword());
 
-            if (loginAuto.getID() != null && loginAuto.getPassword()!= null) {
+            if (loginAuto.getID() != null && loginAuto.getPassword() != null) {
                 if (!loginAuto.getID().equals("") && !loginAuto.getPassword().equals("")) {
                     autoLoginFunction();
                 }
@@ -65,9 +68,19 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void buttonInit() {
-        btnLogin.setOnClickListener(v -> loginFunction());
+        btnLogin.setOnClickListener(v -> {
+            if (!userLoginChecked) {
+                userLoginChecked = true;
+                loginFunction();
+            }
+        });
 
-        btnGuest.setOnClickListener(v -> guestFunction());
+        btnGuest.setOnClickListener(v -> {
+            if (!guestLoginChecked) {
+                guestLoginChecked = true;
+                guestFunction();
+            }
+        });
     }
 
     private void viewInit() {
@@ -97,16 +110,26 @@ public class LoginActivity extends AppCompatActivity {
                     ii.putExtra("tokens", token);
                     ii.putExtra("users", users);
 
+                    guestLoginChecked = false;
+
                     startActivity(ii);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    guestLoginChecked = false;
                 }
             }
 
             @Override
             public void onFailed(VolleyError error) {
-                Toast.makeText(getApplicationContext(), "認證失敗...", Toast.LENGTH_SHORT).show();
+                try {
+                    Toast.makeText(getApplicationContext(), "認證失敗...", Toast.LENGTH_SHORT).show();
+                    guestLoginChecked = false;
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    guestLoginChecked = false;
+                }
             }
         });
     }
@@ -146,20 +169,31 @@ public class LoginActivity extends AppCompatActivity {
 
                             Toast.makeText(getApplicationContext(), "登入成功", Toast.LENGTH_SHORT).show();
 
+                            userLoginChecked = false;
+
                             startActivity(ii);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
+                            userLoginChecked = false;
                         }
                     }
 
                     @Override
                     public void onFailed(VolleyError error) {
-                        if (error.networkResponse.statusCode == 401) {
-                            Toast.makeText(getApplicationContext(), "登入失敗，賬號密碼錯誤", Toast.LENGTH_SHORT).show();
+                        try {
+                            if (error.networkResponse.statusCode == 401) {
+                                Toast.makeText(getApplicationContext(), "登入失敗，賬號密碼錯誤", Toast.LENGTH_SHORT).show();
+                                userLoginChecked = false;
+                            }
+                            else {
+                                error.printStackTrace();
+                            }
 
-                        } else {
+                        } catch (Exception e) {
+                            e.printStackTrace();
                             Toast.makeText(getApplicationContext(), "連接伺服器失敗", Toast.LENGTH_SHORT).show();
+                            userLoginChecked = false;
                         }
                     }
                 });
@@ -207,7 +241,7 @@ public class LoginActivity extends AppCompatActivity {
                         loginAuto.savePassword("");
                         Toast.makeText(getApplicationContext(), "自動登入失敗，請重新登入...", Toast.LENGTH_SHORT).show();
 
-                    }catch (Exception e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -225,7 +259,6 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "請打開網絡後，再打開APP.", Toast.LENGTH_SHORT).show();
 
             new Handler().postDelayed(this::finish, 3500);
-
         }
     }
 }
