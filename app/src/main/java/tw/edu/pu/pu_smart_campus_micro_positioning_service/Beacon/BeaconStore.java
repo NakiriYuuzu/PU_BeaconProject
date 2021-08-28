@@ -1,22 +1,32 @@
 package tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon;
 
+import android.app.Activity;
+import android.content.SharedPreferences;
 import android.util.Log;
+
+import com.android.volley.VolleyError;
 
 import org.altbeacon.beacon.Beacon;
 
 import java.util.ArrayList;
 
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect.VolleyApi;
+
 public class BeaconStore {
 
+    private Activity activity;
     private Beacon o1, o2;
 
     BeaconDefine beaconDefine = new BeaconDefine();
+    VolleyApi volleyApi;
 
-    public BeaconStore(Beacon o1) {
+    public BeaconStore(Activity activity, Beacon o1) {
+        this.activity = activity;
         this.o1 = o1;
     }
 
-    public BeaconStore(Beacon o1, Beacon o2) {
+    public BeaconStore(Activity activity, Beacon o1, Beacon o2) {
+        this.activity = activity;
         this.o1 = o1;
         this.o2 = o2;
     }
@@ -48,11 +58,24 @@ public class BeaconStore {
         if (apiChecked) {
             if (firstBeacon.size() > 0) {
                 Log.e("Safety", beaconDefine.getLocationMsg(firstBeacon.get(0), firstBeacon.get(1)) + " was sent");
+                volleyApi = new VolleyApi(activity, "http://120.110.93.246/CAMEFSC/public/api/scene/1");
 
+                volleyApi.post_API_Safety(new VolleyApi.VolleyCallback() {
+                    @Override
+                    public void onSuccess(String result) {
+
+                    }
+
+                    @Override
+                    public void onFailed(VolleyError error) {
+
+                    }
+                });
             }
 
             if (secondBeacon.size() > 0) {
                 Log.e("Safety", beaconDefine.getLocationMsg(secondBeacon.get(0), secondBeacon.get(1)) + " was sent");
+                volleyApi = new VolleyApi(activity, "");
             }
         }
     }

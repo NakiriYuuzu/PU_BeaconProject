@@ -1,15 +1,16 @@
 package tw.edu.pu.pu_smart_campus_micro_positioning_service.Activity;
 
+import static tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconDefine.*;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.android.volley.Request;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 
@@ -19,16 +20,15 @@ import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.Region;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.TimerTask;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect.VolleyApi;
-import tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconDefine;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconStore;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.YuuzuAlertDialog;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestItem;
 
 public class SafetyActivity extends AppCompatActivity {
@@ -49,9 +49,9 @@ public class SafetyActivity extends AppCompatActivity {
     ShapeableImageView btnBack, btnSOS;
 
     RequestItem requestItem;
-    VolleyApi volleyApi;
     BeaconStore beaconStore;
-    BeaconDefine beaconDefine;
+    YuuzuAlertDialog alertDialog;
+    VolleyApi volleyApi;
 
     BeaconManager beaconManager;
 
@@ -62,20 +62,36 @@ public class SafetyActivity extends AppCompatActivity {
 
         initView();
         initButton();
+        initData();
         beaconInit();
 
         requestItem.requestBluetooth();
     }
 
+    private void initData() {
+
+    }
+
     private void initButton() {
         btnBack.setOnClickListener(v -> {
-            stopScanning();
+            animationStop();
             finish();
         });
 
         btnSafety.setOnClickListener(v -> {
             if (!animationRunning) {
-                showDialog("安全通道", "啓動此功能會實時偵測您所在的位置");
+                alertDialog.showDialog("安全通道", "啓動此功能會實時偵測您所在的位置", new YuuzuAlertDialog.AlertCallback() {
+                    @Override
+                    public void onOkay(DialogInterface dialog, int which) {
+                        animationStart();
+                        dialog.dismiss();
+                    }
+
+                    @Override
+                    public void onCancel(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
 
             } else {
                 animationStop();
@@ -84,51 +100,22 @@ public class SafetyActivity extends AppCompatActivity {
 
         btnSOS.setOnClickListener(v -> {
             if (!sosIsRunning) {
-                MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(this);
-                materialAlertDialogBuilder.setTitle("安全通道SOS");
-                materialAlertDialogBuilder.setMessage("此功能會直接呼叫警衛室");
-                materialAlertDialogBuilder.setBackground(getResources().getDrawable(R.drawable.alert_dialog, null));
-                materialAlertDialogBuilder.setPositiveButton("OKAY", new DialogInterface.OnClickListener() {
+                alertDialog.showDialog("安全通道SOS", "此功能會直接呼叫警衛室", new YuuzuAlertDialog.AlertCallback() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    public void onOkay(DialogInterface dialog, int which) {
                         sos_Start();
                         dialog.dismiss();
                     }
-                });
-                materialAlertDialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    public void onCancel(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 });
-                materialAlertDialogBuilder.show();
-            }
-            else {
+            } else {
                 sos_Stop();
             }
         });
-    }
-
-    private void showDialog(String title, String msg) {
-        MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(this);
-        materialAlertDialogBuilder.setTitle(title);
-        materialAlertDialogBuilder.setMessage(msg);
-        materialAlertDialogBuilder.setBackground(getResources().getDrawable(R.drawable.alert_dialog, null));
-        materialAlertDialogBuilder.setPositiveButton("OKAY", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                animationStart();
-                dialog.dismiss();
-            }
-        });
-        materialAlertDialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                animationStop();
-                dialog.dismiss();
-            }
-        });
-        materialAlertDialogBuilder.show();
     }
 
     private void initView() {
@@ -140,6 +127,7 @@ public class SafetyActivity extends AppCompatActivity {
         btnSafety.setText(R.string.safety_Start);
 
         requestItem = new RequestItem(this);
+        alertDialog = new YuuzuAlertDialog(this);
     }
 
     private void beaconInit() {
@@ -158,6 +146,7 @@ public class SafetyActivity extends AppCompatActivity {
                 firstChecked = false;
                 Log.e(TAG, "Success Get data");
                 List<Beacon> beacons = new ArrayList<>();
+
                 for (Beacon beacon : beaconCollection) {
                     beacons.add(beacon);
                 }
@@ -166,13 +155,13 @@ public class SafetyActivity extends AppCompatActivity {
                     Collections.sort(beacons, (o1, o2) -> Double.compare(o2.getDistance(), o1.getDistance()));
 
                     apiTimer();
-                    if (beacons.size() > 1) {
-                        beaconStore = new BeaconStore(beacons.get(0), beacons.get(1));
-                        beaconStore.beaconData(apiChecked);
-                    }
 
-                    else if (beacons.size() == 1) {
-                        beaconStore = new BeaconStore(beacons.get(0));
+                    if (beacons.size() > 1) {
+                        beaconStore = new BeaconStore(SafetyActivity.this, beacons.get(0), beacons.get(1));
+                        beaconStore.beaconData(apiChecked);
+
+                    } else if (beacons.size() == 1) {
+                        beaconStore = new BeaconStore(SafetyActivity.this, beacons.get(0));
                         beaconStore.beaconData(apiChecked);
                     }
                 }
@@ -186,7 +175,17 @@ public class SafetyActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             if (count_Animation == 4) {
-                                showDialog("安全通道", "此道路暫時不支援安全通道");
+                                alertDialog.showDialog("安全通道", "此道路暫時不支援安全通道", new YuuzuAlertDialog.AlertCallback() {
+                                    @Override
+                                    public void onOkay(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+
+                                    @Override
+                                    public void onCancel(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
                                 animationStop();
                                 count_Animation = 0;
                             }
@@ -198,12 +197,8 @@ public class SafetyActivity extends AppCompatActivity {
                 }
             }
         });
-        try {
-            beaconManager.startRangingBeacons(new Region("Beacon", Identifier.parse("699ebc80-e1f3-11e3-9a0f-0cf3ee3bc012"), null, null));
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        beaconManager.startRangingBeacons(new Region("Beacon", Identifier.parse(UUID_IBEACON_V1), null, null));
     }
 
     private void stopScanning() {
@@ -270,5 +265,12 @@ public class SafetyActivity extends AppCompatActivity {
                 }
             }
         }, 1000);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        beaconManager.removeAllMonitorNotifiers();
+        beaconManager.removeAllRangeNotifiers();
     }
 }

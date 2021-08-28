@@ -74,6 +74,8 @@ public class VolleyApi {
                 callback.onFailed(error);
             }
         });
+
+        requestQueue.add(stringRequest);
     }
 
     /**
@@ -145,6 +147,24 @@ public class VolleyApi {
                 return headers;
             }
         };
+
+        requestQueue.add(stringRequest);
+    }
+
+    public void post_API_Safety(final VolleyCallback callback) {
+        RequestQueue requestQueue = Volley.newRequestQueue(activity);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, API_URL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                callback.onSuccess(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                callback.onFailed(error);
+            }
+        });
 
         requestQueue.add(stringRequest);
     }

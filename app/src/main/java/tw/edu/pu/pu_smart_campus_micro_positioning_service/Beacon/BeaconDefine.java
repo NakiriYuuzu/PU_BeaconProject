@@ -4,8 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BeaconDefine {
+    public static final String UUID_IBEACON_V1 = "699ebc80-e1f3-11e3-9a0f-0cf3ee3bc012";
+    public static final String UUID_IBEACON_V2 = "";
+    public static final String UUID_IBEACON_V3 = "";
+
     public static final String IBEACON_10 = "主顧聖母堂"; //Major 122, Minor 1221
-    public static final String IBEACON_11 = "主顧樓"; //Major 123, Minor 1231
+    public static final String IBEACON_11 = "羅馬競技場"; //Major 123, Minor 1231
     public static final String IBEACON_21 = "若望保祿二世體育館"; //Major 1  , Minor 11365
     public static final String IBEACON_01 = "IBEACON_01";
     public static final String IBEACON_02 = "IBEACON_02";

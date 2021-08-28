@@ -1,19 +1,18 @@
 package tw.edu.pu.pu_smart_campus_micro_positioning_service.Activity;
 
+
+import static tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconDefine.*;
+
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -24,9 +23,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.imageview.ShapeableImageView;
-import com.permissionx.guolindev.PermissionX;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconManager;
@@ -37,11 +34,11 @@ import org.altbeacon.beacon.Region;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.TimerTask;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconDefine;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestItem;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.YuuzuAlertDialog;
 
 public class GuideActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -55,6 +52,7 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
     private BeaconManager beaconManager;
     private BeaconDefine beaconDefine;
     private RequestItem requestItem;
+    private YuuzuAlertDialog alertDialog;
 
     private ShapeableImageView btnBack;
 
@@ -72,7 +70,25 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
             String Message = objBundle.getString("MSG_key");
 
             Log.e("Message", Message);
-            showAlert(Message);
+            alertDialog.showDialog("景點導覽", Message, new YuuzuAlertDialog.AlertCallback() {
+                @Override
+                public void onOkay(DialogInterface dialog, int which) {
+                    switch (Message) {
+                        case "主顧聖母堂":
+                        case "羅馬競技場j":
+                        case "若望保祿二世體育館":
+                            intentToGuideSpot(Message);
+                            Log.e(TAG, "onClick: " + Message);
+                            break;
+                    }
+                    dialog.dismiss();
+                }
+
+                @Override
+                public void onCancel(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
         }
     };
 
@@ -83,7 +99,6 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
 
         initView();
         buttonInit();
-        requestPermission();
         requestItem.requestBluetooth();
         beaconInit();
     }
@@ -113,30 +128,12 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
         btnBack = findViewById(R.id.btn_Guide_back);
         beaconDefine = new BeaconDefine();
         requestItem = new RequestItem(this);
+        alertDialog = new YuuzuAlertDialog(this);
 
         // Google Maps findView
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
-        }
-    }
-
-    private void requestPermission() {
-        if (Build.VERSION.SDK_INT > 23) {
-            PermissionX.init(this)
-                    .permissions(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
-
-                    .onExplainRequestReason((scope, deniedList) -> scope.showRequestReasonDialog(
-                            deniedList, "Grant Permission!", "Sure", "Cancel"))
-
-                    .request((allGranted, grantedList, deniedList) -> {
-                        if (!allGranted) {
-                            Toast.makeText(getApplicationContext(), "Grant Permission failed!", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        } else {
-            Toast.makeText(getApplicationContext(), "您的手機無法使用該應用...", Toast.LENGTH_SHORT).show();
-            finish();
         }
     }
 
@@ -169,15 +166,12 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
             }
         });
 
-        try {
-            beaconManager.startRangingBeacons(new Region("Beacon", Identifier.parse("699ebc80-e1f3-11e3-9a0f-0cf3ee3bc012"), null, null));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        beaconManager.startRangingBeacons(new Region("Beacon", Identifier.parse(UUID_IBEACON_V1), null, null));
+        Log.e(TAG, Identifier.parse(UUID_IBEACON_V1).toString());
     }
 
     private void stopScanning() {
+        beaconManager.removeAllMonitorNotifiers();
         beaconManager.removeAllRangeNotifiers();
     }
 
@@ -192,7 +186,7 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
             @Override
             public void run() {
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(3000);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -208,7 +202,7 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
 
                         switch (str) {
                             case "主顧聖母堂":
-                            case "主顧樓":
+                            case "羅馬競技場":
                             case "若望保祿二世體育館":
                                 shouldShowAlert = false;
                                 objBundle.putString("MSG_key", str);
@@ -228,41 +222,10 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
         objBgThread.start();
     }
 
-    private void showAlert(String str) {
-        MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(this);
-        materialAlertDialogBuilder.setTitle("景點導覽");
-        materialAlertDialogBuilder.setMessage(str);
-        materialAlertDialogBuilder.setBackground(getResources().getDrawable(R.drawable.alert_dialog, null));
-        materialAlertDialogBuilder.setPositiveButton("OKAY", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (str) {
-                    case "主顧聖母堂":
-                    case "主顧樓":
-                    case "若望保祿二世體育館":
-                        intentToGuideSpot(str);
-                        Log.e(TAG, "onClick: " + str);
-                        break;
-                }
-                dialog.dismiss();
-            }
-        });
-        materialAlertDialogBuilder.show();
-    }
-
     private void intentToGuideSpot(String str) {
-        Intent intent = new Intent();
-        intent.setClass(GuideActivity.this, GuideSpotActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString("Key", str);
-        intent.putExtras(bundle);
-        startActivity(intent);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        beaconManager.removeAllRangeNotifiers();
+        Intent ii = new Intent(getApplicationContext(), GuideSpotActivity.class);
+        ii.putExtra("spotName", str);
+        startActivity(ii);
     }
 
     @Override
@@ -323,5 +286,29 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
                 .strokeColor(getColor(R.color.strokeWidth))
                 .fillColor(getColor(R.color.fillStroke))
                 .strokeWidth(5));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopScanning();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopScanning();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startScanning();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopScanning();
     }
 }

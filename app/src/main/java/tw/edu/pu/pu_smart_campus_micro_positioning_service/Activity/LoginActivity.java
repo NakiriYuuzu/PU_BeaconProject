@@ -23,6 +23,7 @@ import tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect.VolleyApi;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.Login_Auto;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestItem;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.ShareData;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -37,6 +38,7 @@ public class LoginActivity extends AppCompatActivity {
 
     RequestItem requestItem;
     Login_Auto loginAuto;
+    ShareData shareData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,21 +52,33 @@ public class LoginActivity extends AppCompatActivity {
 
         } else {
             viewInit();
+            dataInit();
             buttonInit();
-
-            Log.e(TAG + "used", loginAuto.getID() + loginAuto.getPassword());
-
-            if (loginAuto.getID() != null && loginAuto.getPassword() != null) {
-                if (!loginAuto.getID().equals("") && !loginAuto.getPassword().equals("")) {
-                    autoLoginFunction();
-                }
-            }
+            loginInit();
         }
     }
 
     private boolean requestNetworkConnection() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
+    }
+
+    private void loginInit() {
+        Log.e(TAG + "used", loginAuto.getID() + loginAuto.getPassword());
+
+        if (loginAuto.getID() != null && loginAuto.getPassword() != null) {
+            if (!loginAuto.getID().equals("") && !loginAuto.getPassword().equals("")) {
+                autoLoginFunction();
+            }
+        }
+    }
+
+    private void dataInit() {
+        shareData = new ShareData(this);
+        shareData.saveUID("");
+        shareData.saveNAME("");
+        shareData.saveROLE("");
+        shareData.saveTOKEN("");
     }
 
     private void buttonInit() {
@@ -95,45 +109,43 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void guestFunction() {
-        Intent intent = new Intent(LoginActivity.this, Police_MainActivity.class);
-        startActivity(intent);
-//        VolleyApi volleyApi = new VolleyApi(this, "http://120.110.93.246/CAMEFSC1/public/api/login/tourist");
-//        volleyApi.post_API_Login_Guest(requestItem.requestIMEI(), new VolleyApi.VolleyCallback() {
-//            @Override
-//            public void onSuccess(String result) {
-//                Log.e("guest_success", result);
-//
-//                try {
-//                    JSONObject jsonData = new JSONObject(result);
-//                    String token = jsonData.getString("token");
-//                    String users = "tourist";
-//
-//                    Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
-//                    ii.putExtra("tokens", token);
-//                    ii.putExtra("users", users);
-//
-//                    guestLoginChecked = false;
-//
-//                    startActivity(ii);
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    guestLoginChecked = false;
-//                }
-//            }
-//
-//            @Override
-//            public void onFailed(VolleyError error) {
-//                try {
-//                    Toast.makeText(getApplicationContext(), "認證失敗...", Toast.LENGTH_SHORT).show();
-//                    guestLoginChecked = false;
-//
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                    guestLoginChecked = false;
-//                }
-//            }
-//        });
+        VolleyApi volleyApi = new VolleyApi(this, "http://120.110.93.246/CAMEFSC1/public/api/login/tourist");
+        volleyApi.post_API_Login_Guest(requestItem.requestIMEI(), new VolleyApi.VolleyCallback() {
+            @Override
+            public void onSuccess(String result) {
+                Log.e("guest_success", result);
+
+                try {
+                    JSONObject jsonData = new JSONObject(result);
+                    String token = jsonData.getString("token");
+                    String name = "tourist";
+
+                    Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
+                    ii.putExtra("token", token);
+                    ii.putExtra("name", name);
+
+                    guestLoginChecked = false;
+
+                    startActivity(ii);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    guestLoginChecked = false;
+                }
+            }
+
+            @Override
+            public void onFailed(VolleyError error) {
+                try {
+                    Toast.makeText(getApplicationContext(), "認證失敗...", Toast.LENGTH_SHORT).show();
+                    guestLoginChecked = false;
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    guestLoginChecked = false;
+                }
+            }
+        });
     }
 
     private void loginFunction() {
@@ -160,19 +172,16 @@ public class LoginActivity extends AppCompatActivity {
 
                         try {
                             JSONObject jsonData = new JSONObject(result);
-                            String token = jsonData.getString("token");
-                            String users = jsonData.getString("name");
-                            int role = jsonData.getInt("role");
-
-                            Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
-                            ii.putExtra("tokens", token);
-                            ii.putExtra("users", users);
-                            ii.putExtra("role", role);
+                            shareData.saveUID(jsonData.getString("uid"));
+                            shareData.saveNAME(jsonData.getString("name"));
+                            shareData.saveROLE(String.valueOf(jsonData.getInt("role")));
+                            shareData.saveTOKEN(jsonData.getString("token"));
 
                             Toast.makeText(getApplicationContext(), "登入成功", Toast.LENGTH_SHORT).show();
 
                             userLoginChecked = false;
 
+                            Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
                             startActivity(ii);
 
                         } catch (JSONException e) {
@@ -187,8 +196,7 @@ public class LoginActivity extends AppCompatActivity {
                             if (error.networkResponse.statusCode == 401) {
                                 Toast.makeText(getApplicationContext(), "登入失敗，賬號密碼錯誤", Toast.LENGTH_SHORT).show();
                                 userLoginChecked = false;
-                            }
-                            else {
+                            } else {
                                 error.printStackTrace();
                             }
 
@@ -218,17 +226,15 @@ public class LoginActivity extends AppCompatActivity {
 
                     try {
                         JSONObject jsonData = new JSONObject(result);
-                        String token = jsonData.getString("token");
-                        String users = jsonData.getString("name");
-                        int role = jsonData.getInt("role");
 
-                        Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
-                        ii.putExtra("tokens", token);
-                        ii.putExtra("users", users);
-                        ii.putExtra("role", role);
+                        shareData.saveUID(jsonData.getString("uid"));
+                        shareData.saveNAME(jsonData.getString("name"));
+                        shareData.saveROLE(String.valueOf(jsonData.getInt("role")));
+                        shareData.saveTOKEN(jsonData.getString("token"));
 
                         Toast.makeText(getApplicationContext(), "登入成功", Toast.LENGTH_SHORT).show();
 
+                        Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
                         startActivity(ii);
 
                     } catch (JSONException e) {

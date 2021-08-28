@@ -3,20 +3,26 @@ package tw.edu.pu.pu_smart_campus_micro_positioning_service.Activity;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.util.Log;
 
 import com.android.volley.VolleyError;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect.VolleyApi;
-import tw.edu.pu.pu_smart_campus_micro_positioning_service.Database.DBHelper;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 
 public class GuideSpotActivity extends AppCompatActivity {
+
+    private String spotNames = "";
 
     private MaterialTextView tvName, tvGuideInfo;
     private ShapeableImageView btnBack, ivSpotImage;
@@ -32,53 +38,44 @@ public class GuideSpotActivity extends AppCompatActivity {
         viewInit();
         buttonInit();
         getData();
-        createInformation();
     }
 
     private void getData() {
-        volleyApi = new VolleyApi(this, "https://nakiriyuuzu.github.io/volleyTest/dat.php");
+        volleyApi = new VolleyApi(this, "http://120.110.93.246/volleyTest/dat.php");
         volleyApi.get_API_GuideActivity(new VolleyApi.VolleyCallback() {
             @Override
             public void onSuccess(String result) {
-                Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
+                Log.e("onSuccess", result);
+                Log.e("spotNames", spotNames);
+
+                ArrayList<JSONObject> jsonData = new ArrayList<>();
+
+                try {
+                    JSONArray allData = new JSONArray(result);
+
+                    for (int i = 0; i < allData.length(); i++) {
+                        JSONObject data = allData.getJSONObject(i);
+                        jsonData.add(data);
+                    }
+
+                    for (int i = 0; i < jsonData.size(); i++) {
+                        if (jsonData.get(i).getString("Name").equals(spotNames)) {
+                            tvName.setText(jsonData.get(i).getString("Name"));
+                            tvGuideInfo.setText(jsonData.get(i).getString("Info"));
+                        }
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
             }
 
             @Override
             public void onFailed(VolleyError error) {
-                Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
+                Log.e("onFailed", error.toString());
             }
         });
-    }
-
-    private void createInformation() {
-        DBHelper DB = new DBHelper(this);
-        String [] spotData;
-
-        Bundle bundle = getIntent().getExtras();
-        String str = bundle.getString("Key");
-
-
-        spotData = DB.fetchSpotData(str);
-        if(spotData.length > 0){
-
-            tvName.setText(spotData[0]);
-            tvGuideInfo.setText(spotData[1]);
-            if(str.equals("主顧聖母堂")) {
-                ivSpotImage.setImageResource(R.drawable.providence_chapel);
-            }
-            else if(str.equals("主顧樓")){
-                ivSpotImage.setImageResource(R.drawable.providence_hall);
-            }
-            else if(str.equals("若望保祿二世體育館")){
-                ivSpotImage.setImageResource(R.drawable.sport_hall);
-            }
-
-            btnUrl.setOnClickListener(v -> {
-                Uri uri = Uri.parse(spotData[2]);
-                Intent intent = new Intent(Intent.ACTION_VIEW,uri);
-                startActivity(intent);
-            });
-        }
     }
 
     private void viewInit() {
@@ -87,6 +84,10 @@ public class GuideSpotActivity extends AppCompatActivity {
         btnUrl = findViewById(R.id.btnUrl);
         btnBack = findViewById(R.id.btn_check_back);
         tvGuideInfo = findViewById(R.id.tvGuideInfo);
+
+        Intent ii = getIntent();
+        if (ii != null)
+            spotNames = ii.getStringExtra("spotName");
     }
 
     private void buttonInit() {

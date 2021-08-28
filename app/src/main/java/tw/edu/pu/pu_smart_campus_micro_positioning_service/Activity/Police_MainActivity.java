@@ -18,6 +18,7 @@ import com.permissionx.guolindev.PermissionX;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.Login_Auto;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestItem;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.ShareData;
 
 public class Police_MainActivity extends AppCompatActivity {
 
@@ -30,6 +31,7 @@ public class Police_MainActivity extends AppCompatActivity {
 
     RequestItem permissionRequest;
     Login_Auto loginAuto;
+    ShareData shareData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,24 +56,20 @@ public class Police_MainActivity extends AppCompatActivity {
 
         permissionRequest = new RequestItem(this);
         loginAuto = new Login_Auto(this);
+        shareData = new ShareData(this);
     }
 
     private void initData() {
-        Intent intent = getIntent();
-        if (intent != null) {
-            users = intent.getStringExtra("users");
-            role = intent.getIntExtra("role", 99);
+        if (!shareData.getNAME().equals("")) {
+            userNames.setText(shareData.getNAME());
         }
-
-        userNames.setText(users);
-        Log.e("INTENT", users + role);
     }
 
     private void roleCheck() {
-        if (role == 1 || role == 3) {
+        if (shareData.getROLE().equals("1") || shareData.getROLE().equals("3")) {
             btnMonitor.setVisibility(View.INVISIBLE);
         }
-        else if (role == 0) {
+        else if (shareData.getROLE().equals("0")) {
             btnMonitor.setVisibility(View.INVISIBLE);
             btnSafety.setVisibility(View.INVISIBLE);
         }
