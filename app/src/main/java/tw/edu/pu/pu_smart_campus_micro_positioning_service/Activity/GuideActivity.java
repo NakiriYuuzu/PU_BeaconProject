@@ -58,7 +58,8 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
 
     private String TmpMajor;
     private String TmpMinor;
-    private boolean shouldShowAlert = true;
+    private int CounterBeacon = 3;
+    private boolean AlertShow = true;
 
     @SuppressLint("HandlerLeak")
     Handler objHandler = new Handler() {
@@ -70,25 +71,25 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
             String Message = objBundle.getString("MSG_key");
 
             Log.e("Message", Message);
-            alertDialog.showDialog("景點導覽", Message, new YuuzuAlertDialog.AlertCallback() {
-                @Override
-                public void onOkay(DialogInterface dialog, int which) {
-                    switch (Message) {
-                        case "主顧聖母堂":
-                        case "羅馬競技場j":
-                        case "若望保祿二世體育館":
-                            intentToGuideSpot(Message);
-                            Log.e(TAG, "onClick: " + Message);
-                            break;
+            Log.e("Counter", "CounterBeacon: " + CounterBeacon);
+            if(CounterBeacon == 3 && AlertShow) {
+                AlertShow = false;
+                alertDialog.showDialog("景點導覽", Message, new YuuzuAlertDialog.AlertCallback() {
+                    @Override
+                    public void onOkay(DialogInterface dialog, int which) {
+                        intentToGuideSpot(Message);
+                        Log.e(TAG, "onClick: " + Message);
+                        AlertShow = true;
+                        dialog.dismiss();
                     }
-                    dialog.dismiss();
-                }
 
-                @Override
-                public void onCancel(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
+                    @Override
+                    public void onCancel(DialogInterface dialog, int which) {
+                        AlertShow = true;
+                        dialog.dismiss();
+                    }
+                });
+            }
         }
     };
 
@@ -143,13 +144,11 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
 
         Log.e(TAG, "startScanning...");
         beaconManager.addRangeNotifier((collection, region) -> {
-            Log.e(TAG, "SCANNING!\nBeaconDATA: " + collection.size());
             if (collection.size() > 0) {
                 List<Beacon> beacons = new ArrayList<>();
                 for (Beacon beaconData : collection) {
                     if (beaconData.getDistance() <= 30) {
                         beacons.add(beaconData);
-                        Log.e("Beacon", beaconDefine.getLocationMsg(String.valueOf(beaconData.getId2()), String.valueOf(beaconData.getId3())));
                     }
 
                     if (beacons.size() > 0) {
@@ -157,12 +156,9 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
                         Collections.sort(beacons, (o1, o2) -> Double.compare(o2.getDistance(), o1.getDistance()));
 
                         Beacon beacon = beacons.get(0);
-                        Log.e("Should show Alert", String.valueOf(shouldShowAlert));
                         showData(beacon);
                     }
                 }
-            } else {
-                Log.e("BeaconMsg", "didRangeBeaconsInRegion: No Beacon detected");
             }
         });
 
@@ -194,25 +190,33 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
                 if (TmpMajor == null && TmpMinor == null) {
                     TmpMajor = major;
                     TmpMinor = minor;
+
+                    String str = beaconDefine.getLocationMsg(major, minor);
+
+                    objBundle.putString("MSG_key", str);
+                    objMessage.setData(objBundle);
+                    objHandler.sendMessage(objMessage);
                 }
-
-                if (TmpMajor.equals(major) && TmpMinor.equals(minor)) {
-                    if (shouldShowAlert) {
-                        String str = beaconDefine.getLocationMsg(major, minor);
-
-                        switch (str) {
-                            case "主顧聖母堂":
-                            case "羅馬競技場":
-                            case "若望保祿二世體育館":
-                                shouldShowAlert = false;
-                                objBundle.putString("MSG_key", str);
-                                objMessage.setData(objBundle);
-                                objHandler.sendMessage(objMessage);
-                        }
-                    } else {
-                        shouldShowAlert = true;
+                else if(TmpMajor != null && TmpMinor != null){
+                    if(!TmpMajor.equals(major) && !TmpMinor.equals(minor)) {
                         TmpMajor = major;
                         TmpMinor = minor;
+                        CounterBeacon = 0;
+
+                        String str = beaconDefine.getLocationMsg(major, minor);
+
+                        objBundle.putString("MSG_key", str);
+                        objMessage.setData(objBundle);
+                        objHandler.sendMessage(objMessage);
+                    }
+                    else {
+                        String str = beaconDefine.getLocationMsg(major, minor);
+
+                        objBundle.putString("MSG_key", str);
+                        objMessage.setData(objBundle);
+                        objHandler.sendMessage(objMessage);
+
+                        CounterBeacon++;
                     }
                 }
             }
