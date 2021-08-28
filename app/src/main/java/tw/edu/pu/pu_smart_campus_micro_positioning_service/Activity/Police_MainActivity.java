@@ -6,7 +6,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -17,7 +16,7 @@ import com.permissionx.guolindev.PermissionX;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.Login_Auto;
-import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestItem;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestHelper;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.ShareData;
 
 public class Police_MainActivity extends AppCompatActivity {
@@ -26,10 +25,7 @@ public class Police_MainActivity extends AppCompatActivity {
     private MaterialTextView userNames;
     private ShapeableImageView btnSignOut;
 
-    private int role;
-    private String users;
-
-    RequestItem permissionRequest;
+    RequestHelper requestHelper;
     Login_Auto loginAuto;
     ShareData shareData;
 
@@ -43,7 +39,6 @@ public class Police_MainActivity extends AppCompatActivity {
         roleCheck();
         btnInit();
         requestPermission();
-        permissionRequest.requestBluetooth();
     }
 
     private void viewInit() {
@@ -54,7 +49,7 @@ public class Police_MainActivity extends AppCompatActivity {
         btnSignOut = findViewById(R.id.btn_SignOut);
         userNames = findViewById(R.id.userNames);
 
-        permissionRequest = new RequestItem(this);
+        requestHelper = new RequestHelper(this);
         loginAuto = new Login_Auto(this);
         shareData = new ShareData(this);
     }

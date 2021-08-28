@@ -95,7 +95,6 @@ public class CheckActivity extends AppCompatActivity {
     }
 
     private void apiData() {
-        Check_ViewModel check_viewModel = new Check_ViewModel();
         VolleyApi volleyApi = new VolleyApi(this, "http://120.110.93.246/CAMEFSC/public/api/people");
 
         volleyApi.get_API_CheckActivity(new VolleyApi.VolleyCallback() {

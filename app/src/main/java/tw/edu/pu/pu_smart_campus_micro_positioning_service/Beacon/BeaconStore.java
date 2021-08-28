@@ -14,7 +14,7 @@ import tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect.VolleyApi;
 
 public class BeaconStore {
 
-    private Activity activity;
+    private final Activity activity;
     private Beacon o1, o2;
 
     BeaconDefine beaconDefine = new BeaconDefine();

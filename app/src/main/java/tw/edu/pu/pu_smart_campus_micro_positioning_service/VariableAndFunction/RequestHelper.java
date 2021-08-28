@@ -1,23 +1,22 @@
 package tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.provider.Settings;
 import android.widget.Toast;
 
-import com.permissionx.guolindev.PermissionX;
+import org.altbeacon.bluetooth.BluetoothMedic;
 
-public class RequestItem {
+
+public class RequestHelper {
 
     private final Context context;
 
-    public RequestItem(Context context) {
+    public RequestHelper(Context context) {
         this.context = context;
     }
 
@@ -46,5 +45,12 @@ public class RequestItem {
     @SuppressLint("HardwareIds")
     public String requestIMEI() {
         return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+    }
+
+    public void flushBluetooth() {
+        BluetoothMedic medic = BluetoothMedic.getInstance();
+        medic.enablePowerCycleOnFailures(context);
+        medic.enablePeriodicTests(context, BluetoothMedic.SCAN_TEST |
+                BluetoothMedic.TRANSMIT_TEST);
     }
 }

@@ -37,7 +37,7 @@ import java.util.List;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconDefine;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
-import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestItem;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestHelper;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.YuuzuAlertDialog;
 
 public class GuideActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -51,14 +51,16 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
 
     private BeaconManager beaconManager;
     private BeaconDefine beaconDefine;
-    private RequestItem requestItem;
+    private RequestHelper requestHelper;
     private YuuzuAlertDialog alertDialog;
 
     private ShapeableImageView btnBack;
 
     private String TmpMajor;
     private String TmpMinor;
+
     private int CounterBeacon = 3;
+
     private boolean AlertShow = true;
 
     @SuppressLint("HandlerLeak")
@@ -100,7 +102,7 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
 
         initView();
         buttonInit();
-        requestItem.requestBluetooth();
+        requestHelper.requestBluetooth();
         beaconInit();
     }
 
@@ -113,8 +115,6 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
 
         beaconManager.setForegroundBetweenScanPeriod(DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD);
         beaconManager.setForegroundScanPeriod(DEFAULT_FOREGROUND_SCAN_PERIOD);
-
-        startScanning();
     }
 
     private void buttonInit() {
@@ -128,7 +128,7 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
         //findView
         btnBack = findViewById(R.id.btn_Guide_back);
         beaconDefine = new BeaconDefine();
-        requestItem = new RequestItem(this);
+        requestHelper = new RequestHelper(this);
         alertDialog = new YuuzuAlertDialog(this);
 
         // Google Maps findView
@@ -142,12 +142,14 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
         beaconManager.removeAllMonitorNotifiers();
         beaconManager.removeAllRangeNotifiers();
 
+        new Thread(() -> requestHelper.flushBluetooth()).start();
+
         Log.e(TAG, "startScanning...");
         beaconManager.addRangeNotifier((collection, region) -> {
             if (collection.size() > 0) {
                 List<Beacon> beacons = new ArrayList<>();
                 for (Beacon beaconData : collection) {
-                    if (beaconData.getDistance() <= 30) {
+                    if (beaconData.getDistance() <= 15f) {
                         beacons.add(beaconData);
                     }
 
@@ -163,7 +165,6 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
         });
 
         beaconManager.startRangingBeacons(new Region("Beacon", Identifier.parse(UUID_IBEACON_V1), null, null));
-        Log.e(TAG, Identifier.parse(UUID_IBEACON_V1).toString());
     }
 
     private void stopScanning() {
@@ -176,13 +177,13 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
         String minor = String.valueOf(beacon.getId3());
 
         Runnable objRunnable = new Runnable() {
-            Message objMessage = objHandler.obtainMessage();
-            Bundle objBundle = new Bundle();
+            final Message objMessage = objHandler.obtainMessage();
+            final Bundle objBundle = new Bundle();
 
             @Override
             public void run() {
                 try {
-                    Thread.sleep(3000);
+                    Thread.sleep(1000);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -201,7 +202,7 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
                     if(!TmpMajor.equals(major) && !TmpMinor.equals(minor)) {
                         TmpMajor = major;
                         TmpMinor = minor;
-                        CounterBeacon = 0;
+                        CounterBeacon = 2;
 
                         String str = beaconDefine.getLocationMsg(major, minor);
 
@@ -217,6 +218,10 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
                         objHandler.sendMessage(objMessage);
 
                         CounterBeacon++;
+
+                        if (CounterBeacon >= 300) {
+                            CounterBeacon = 3;
+                        }
                     }
                 }
             }

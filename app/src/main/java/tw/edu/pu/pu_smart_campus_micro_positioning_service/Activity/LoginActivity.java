@@ -22,7 +22,7 @@ import org.json.JSONObject;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect.VolleyApi;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.Login_Auto;
-import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestItem;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestHelper;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.ShareData;
 
 public class LoginActivity extends AppCompatActivity {
@@ -36,7 +36,7 @@ public class LoginActivity extends AppCompatActivity {
     private MaterialButton btnLogin, btnGuest;
     private CheckBox btnRememberMe;
 
-    RequestItem requestItem;
+    RequestHelper requestHelper;
     Login_Auto loginAuto;
     ShareData shareData;
 
@@ -104,50 +104,48 @@ public class LoginActivity extends AppCompatActivity {
         btnGuest = findViewById(R.id.btn_Guest);
         btnRememberMe = findViewById(R.id.checkBox_rememberMe);
 
-        requestItem = new RequestItem(this);
+        requestHelper = new RequestHelper(this);
         loginAuto = new Login_Auto(this);
     }
 
     private void guestFunction() {
-        Intent intent = new Intent(this, Police_MainActivity.class);
-        startActivity(intent);
-//        VolleyApi volleyApi = new VolleyApi(this, "http://120.110.93.246/CAMEFSC1/public/api/login/tourist");
-//        volleyApi.post_API_Login_Guest(requestItem.requestIMEI(), new VolleyApi.VolleyCallback() {
-//            @Override
-//            public void onSuccess(String result) {
-//                Log.e("guest_success", result);
-//
-//                try {
-//                    JSONObject jsonData = new JSONObject(result);
-//                    String token = jsonData.getString("token");
-//                    String name = "tourist";
-//
-//                    Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
-//                    ii.putExtra("token", token);
-//                    ii.putExtra("name", name);
-//
-//                    guestLoginChecked = false;
-//
-//                    startActivity(ii);
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    guestLoginChecked = false;
-//                }
-//            }
-//
-//            @Override
-//            public void onFailed(VolleyError error) {
-//                try {
-//                    Toast.makeText(getApplicationContext(), "認證失敗...", Toast.LENGTH_SHORT).show();
-//                    guestLoginChecked = false;
-//
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                    guestLoginChecked = false;
-//                }
-//            }
-//        });
+        VolleyApi volleyApi = new VolleyApi(this, "http://120.110.93.246/CAMEFSC1/public/api/login/tourist");
+        volleyApi.post_API_Login_Guest(requestHelper.requestIMEI(), new VolleyApi.VolleyCallback() {
+            @Override
+            public void onSuccess(String result) {
+                Log.e("guest_success", result);
+
+                try {
+                    JSONObject jsonData = new JSONObject(result);
+                    String token = jsonData.getString("token");
+                    String name = "tourist";
+
+                    Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
+                    ii.putExtra("token", token);
+                    ii.putExtra("name", name);
+
+                    guestLoginChecked = false;
+
+                    startActivity(ii);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    guestLoginChecked = false;
+                }
+            }
+
+            @Override
+            public void onFailed(VolleyError error) {
+                try {
+                    Toast.makeText(getApplicationContext(), "認證失敗...", Toast.LENGTH_SHORT).show();
+                    guestLoginChecked = false;
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    guestLoginChecked = false;
+                }
+            }
+        });
     }
 
     private void loginFunction() {

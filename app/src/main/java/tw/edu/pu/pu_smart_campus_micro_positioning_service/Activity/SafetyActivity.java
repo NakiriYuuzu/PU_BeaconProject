@@ -5,7 +5,6 @@ import static tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconD
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -18,9 +17,11 @@ import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.Identifier;
+import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.TimerTask;
@@ -29,7 +30,7 @@ import tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect.VolleyApi;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconStore;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.YuuzuAlertDialog;
-import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestItem;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestHelper;
 
 public class SafetyActivity extends AppCompatActivity {
 
@@ -48,7 +49,7 @@ public class SafetyActivity extends AppCompatActivity {
     MaterialTextView btnSafety;
     ShapeableImageView btnBack, btnSOS;
 
-    RequestItem requestItem;
+    RequestHelper requestHelper;
     BeaconStore beaconStore;
     YuuzuAlertDialog alertDialog;
     VolleyApi volleyApi;
@@ -62,14 +63,8 @@ public class SafetyActivity extends AppCompatActivity {
 
         initView();
         initButton();
-        initData();
         beaconInit();
-
-        requestItem.requestBluetooth();
-    }
-
-    private void initData() {
-
+        requestHelper.requestBluetooth();
     }
 
     private void initButton() {
@@ -126,7 +121,7 @@ public class SafetyActivity extends AppCompatActivity {
 
         btnSafety.setText(R.string.safety_Start);
 
-        requestItem = new RequestItem(this);
+        requestHelper = new RequestHelper(this);
         alertDialog = new YuuzuAlertDialog(this);
     }
 
@@ -140,6 +135,9 @@ public class SafetyActivity extends AppCompatActivity {
     private void startScanning() {
         beaconManager.removeAllMonitorNotifiers();
         beaconManager.removeAllRangeNotifiers();
+
+        new Thread(() -> requestHelper.flushBluetooth()).start();
+
         beaconManager.addRangeNotifier((beaconCollection, region) -> {
             if (beaconCollection.size() > 0) {
                 count_Alert = 0;
@@ -202,6 +200,7 @@ public class SafetyActivity extends AppCompatActivity {
     }
 
     private void stopScanning() {
+        beaconManager.removeAllMonitorNotifiers();
         beaconManager.removeAllRangeNotifiers();
     }
 

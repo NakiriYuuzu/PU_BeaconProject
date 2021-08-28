@@ -3,10 +3,12 @@ package tw.edu.pu.pu_smart_campus_micro_positioning_service.Activity;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.android.volley.VolleyError;
+import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
@@ -23,6 +25,8 @@ import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 public class GuideSpotActivity extends AppCompatActivity {
 
     private String spotNames = "";
+    private String imageURL = "";
+    private String infoURL = "";
 
     private MaterialTextView tvName, tvGuideInfo;
     private ShapeableImageView btnBack, ivSpotImage;
@@ -36,12 +40,12 @@ public class GuideSpotActivity extends AppCompatActivity {
         setContentView(R.layout.activity_guide_spot);
 
         viewInit();
-        buttonInit();
         getData();
+        buttonInit();
     }
 
     private void getData() {
-        volleyApi = new VolleyApi(this, "http://120.110.93.246/volleyTest/dat.php");
+        volleyApi = new VolleyApi(this, "http://120.110.93.246/volleyTest/data.php");
         volleyApi.get_API_GuideActivity(new VolleyApi.VolleyCallback() {
             @Override
             public void onSuccess(String result) {
@@ -62,8 +66,16 @@ public class GuideSpotActivity extends AppCompatActivity {
                         if (jsonData.get(i).getString("Name").equals(spotNames)) {
                             tvName.setText(jsonData.get(i).getString("Name"));
                             tvGuideInfo.setText(jsonData.get(i).getString("Info"));
+
+                            Log.e("image",jsonData.get(i).getString("ImageUrl"));
+                            Log.e("infoURL",jsonData.get(i).getString("InfoUrl"));
+                            imageURL = jsonData.get(i).getString("ImageUrl");
+                            infoURL = jsonData.get(i).getString("InfoUrl");
                         }
                     }
+
+                    //Image loader
+                    Glide.with(GuideSpotActivity.this).load(imageURL).into(ivSpotImage);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -92,5 +104,11 @@ public class GuideSpotActivity extends AppCompatActivity {
 
     private void buttonInit() {
         btnBack.setOnClickListener(v -> finish());
+
+        btnUrl.setOnClickListener(v -> {
+            if (!infoURL.equals("")) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(infoURL)));
+            }
+        });
     }
 }
