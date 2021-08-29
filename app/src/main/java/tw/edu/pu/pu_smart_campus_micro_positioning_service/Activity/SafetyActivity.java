@@ -5,6 +5,8 @@ import static tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconD
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -55,6 +57,8 @@ public class SafetyActivity extends AppCompatActivity {
     VolleyApi volleyApi;
 
     BeaconManager beaconManager;
+    MediaPlayer mediaPlayer;
+    AudioManager audioManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +69,7 @@ public class SafetyActivity extends AppCompatActivity {
         initButton();
         beaconInit();
         requestHelper.requestBluetooth();
+
     }
 
     private void initButton() {
@@ -224,15 +229,41 @@ public class SafetyActivity extends AppCompatActivity {
     }
 
     private void sos_Start() {
+        soundPlay();
         int imageRes = getResources().getIdentifier("sos_1", "drawable", getPackageName());
         btnSOS.setImageResource(imageRes);
         sosIsRunning = true;
     }
 
     private void sos_Stop() {
+        soundStop();
         int imageRes = getResources().getIdentifier("sos_0", "drawable", getPackageName());
         btnSOS.setImageResource(imageRes);
         sosIsRunning = false;
+    }
+
+    private void soundPlay(){
+        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 100, 0);
+
+        if(mediaPlayer == null){
+            mediaPlayer = MediaPlayer.create(this, R.raw.beepsoundeffect);
+        }
+
+        mediaPlayer.start();
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mediaPlayer.start();
+            }
+        });
+    }
+
+    private void soundStop(){
+        if(mediaPlayer != null){
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
     }
 
     private void apiTimer() {
