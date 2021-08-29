@@ -28,10 +28,11 @@ import com.google.android.material.imageview.ShapeableImageView;
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
-import org.altbeacon.beacon.Identifier;
+import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -145,7 +146,8 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
         new Thread(() -> requestHelper.flushBluetooth()).start();
 
         Log.e(TAG, "startScanning...");
-        beaconManager.addRangeNotifier((collection, region) -> {
+
+        RangeNotifier rangeNotifier = (collection, region) -> {
             if (collection.size() > 0) {
                 List<Beacon> beacons = new ArrayList<>();
                 for (Beacon beaconData : collection) {
@@ -162,14 +164,16 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
                     }
                 }
             }
-        });
+        };
 
-        beaconManager.startRangingBeacons(new Region("Beacon", Identifier.parse(UUID_IBEACON_V1), null, null));
+        beaconManager.addRangeNotifier(rangeNotifier);
+        beaconManager.startRangingBeacons(REGION_BEACON_01);
     }
 
     private void stopScanning() {
         beaconManager.removeAllMonitorNotifiers();
         beaconManager.removeAllRangeNotifiers();
+        beaconManager.stopRangingBeacons(REGION_BEACON_01);
     }
 
     private void showData(Beacon beacon) {

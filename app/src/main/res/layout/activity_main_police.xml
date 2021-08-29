@@ -34,7 +34,7 @@
         android:layout_marginTop="35dp"
         android:layout_marginEnd="70dp"
         android:text="@string/title_Main"
-        android:textColor="@color/darkBlue"
+        android:textColor="?attr/colorPrimaryVariant"
         android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/btn_SignOut"
@@ -48,7 +48,7 @@
         android:layout_marginStart="30dp"
         android:layout_marginTop="30dp"
         android:text="@string/app_Title"
-        android:textColor="@color/darkBlue"
+        android:textColor="?attr/colorPrimaryVariant"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/shapeableImageView2" />
@@ -59,7 +59,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
         android:text="@string/text_hello"
-        android:textColor="@color/lightBlue"
+        android:textColor="?attr/colorSecondaryVariant"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/materialTextView2" />
@@ -72,7 +72,7 @@
         android:layout_marginStart="10dp"
         android:text=""
         android:textAlignment="textStart"
-        android:textColor="@color/lightBlue"
+        android:textColor="?attr/colorSecondaryVariant"
         android:textSize="20sp"
         app:layout_constraintStart_toEndOf="@+id/materialTextView4"
         app:layout_constraintTop_toBottomOf="@+id/materialTextView2" />

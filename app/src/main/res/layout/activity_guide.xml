@@ -25,7 +25,7 @@
         android:layout_marginStart="61dp"
         android:layout_marginTop="30dp"
         android:text="@string/title_guide"
-        android:textColor="@color/darkBlue"
+        android:textColor="?attr/colorPrimaryVariant"
         android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/btn_Guide_back"

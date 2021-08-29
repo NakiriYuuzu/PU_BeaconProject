@@ -44,7 +44,7 @@ public class check_RecycleViewFragment extends Fragment {
 
         importData();
         initRecycleView();
-        timer.schedule(timerTask, 5000, 5000);
+        timer.schedule(timerTask, 10250, 10250);
 
         return view;
     }
@@ -79,5 +79,12 @@ public class check_RecycleViewFragment extends Fragment {
     private void importData() {
         ShareData shareData = new ShareData(getContext(), viewList);
         viewList = shareData.loadData();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        timer.cancel();
+        timer.purge();
     }
 }

@@ -113,4 +113,11 @@ public class CheckActivity extends AppCompatActivity {
         super.onResume();
         apiData();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        timer.purge();
+        timer.cancel();
+    }
 }

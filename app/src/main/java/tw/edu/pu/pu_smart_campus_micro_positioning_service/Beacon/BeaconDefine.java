@@ -1,9 +1,13 @@
 package tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon;
 
+import org.altbeacon.beacon.Region;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class BeaconDefine {
+    public static final Region REGION_BEACON_01 = new Region("REGION_BEACON_01", null, null, null);
+
     public static final String UUID_IBEACON_V1 = "699ebc80-e1f3-11e3-9a0f-0cf3ee3bc012";
     public static final String UUID_IBEACON_V2 = "";
     public static final String UUID_IBEACON_V3 = "";
