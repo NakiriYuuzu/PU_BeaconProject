@@ -65,6 +65,7 @@ public class SafetyActivity extends AppCompatActivity {
         initButton();
         beaconInit();
         requestHelper.requestBluetooth();
+
     }
 
     private void initButton() {
@@ -237,6 +238,7 @@ public class SafetyActivity extends AppCompatActivity {
 
     private void soundPlay(){
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+
         audioManager.setStreamVolume(AudioManager.STREAM_RING, 100, 0);
 
         if(mediaPlayer == null){
