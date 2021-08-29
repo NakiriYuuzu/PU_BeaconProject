@@ -9,11 +9,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -23,16 +26,15 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.RangeNotifier;
-import org.altbeacon.beacon.Region;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -49,6 +51,7 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
     private static final long DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD = 1000L;
 
     private GoogleMap gMap;
+    private FusedLocationProviderClient client;
 
     private BeaconManager beaconManager;
     private BeaconDefine beaconDefine;
@@ -137,6 +140,9 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
+
+        // Get user location findView
+        client = LocationServices.getFusedLocationProviderClient(this);
     }
 
     private void startScanning() {
@@ -238,12 +244,16 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
         startActivity(ii);
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         gMap = googleMap;
 
-        // 靜宜大學在Google Maps上的經緯度
-        //LatLng pu = new LatLng(24.22614525191815, 120.57709151695924);
+        // 因為已經在 PoliceMainActivity 裡請求 Location，因此此處無需再請求 Location
+        gMap.setMyLocationEnabled(true);
+
+        // 將畫面定在使用者位置，前提是使用者的位置在靜宜大學範圍內
+        ZoomToUserLocation();
 
         // 將範圍限定在靜宜大學
         LatLngBounds puBounds = new LatLngBounds(
@@ -296,6 +306,15 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
                 .strokeColor(getColor(R.color.strokeWidth))
                 .fillColor(getColor(R.color.fillStroke))
                 .strokeWidth(5));
+    }
+
+    private void ZoomToUserLocation() {
+        @SuppressLint("MissingPermission")
+        Task<Location> locationTask = client.getLastLocation();
+        locationTask.addOnSuccessListener(location -> {
+            LatLng myLocation = new LatLng(location.getLatitude(), location.getLongitude());
+            gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 17));
+        });
     }
 
     @Override
