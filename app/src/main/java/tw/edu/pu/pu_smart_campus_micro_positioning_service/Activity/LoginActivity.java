@@ -109,42 +109,40 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void guestFunction() {
-        Intent ii = new Intent(LoginActivity.this,Police_MainActivity.class);
-        startActivity(ii);
-//        VolleyApi volleyApi = new VolleyApi(this, "http://120.110.93.246/CAMEFSC1/public/api/login/tourist");
-//        volleyApi.post_API_Login_Guest(requestHelper.requestIMEI(), new VolleyApi.VolleyCallback() {
-//            @Override
-//            public void onSuccess(String result) {
-//                Log.e("guest_success", result);
-//
-//                try {
-//                    JSONObject jsonData = new JSONObject(result);
-//                    shareData.saveTOKEN(jsonData.getString("token"));
-//
-//                    Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
-//
-//                    guestLoginChecked = false;
-//
-//                    startActivity(ii);
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    guestLoginChecked = false;
-//                }
-//            }
-//
-//            @Override
-//            public void onFailed(VolleyError error) {
-//                try {
-//                    Toast.makeText(getApplicationContext(), "認證失敗...", Toast.LENGTH_SHORT).show();
-//                    guestLoginChecked = false;
-//
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                    guestLoginChecked = false;
-//                }
-//            }
-//        });
+        VolleyApi volleyApi = new VolleyApi(this, "http://120.110.93.246/CAMEFSC1/public/api/login/tourist");
+        volleyApi.post_API_Login_Guest(requestHelper.requestIMEI(), new VolleyApi.VolleyCallback() {
+            @Override
+            public void onSuccess(String result) {
+                Log.e("guest_success", result);
+
+                try {
+                    JSONObject jsonData = new JSONObject(result);
+                    shareData.saveTOKEN(jsonData.getString("token"));
+
+                    Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
+
+                    guestLoginChecked = false;
+
+                    startActivity(ii);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    guestLoginChecked = false;
+                }
+            }
+
+            @Override
+            public void onFailed(VolleyError error) {
+                try {
+                    Toast.makeText(getApplicationContext(), "認證失敗...", Toast.LENGTH_SHORT).show();
+                    guestLoginChecked = false;
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    guestLoginChecked = false;
+                }
+            }
+        });
     }
 
     private void loginFunction() {
