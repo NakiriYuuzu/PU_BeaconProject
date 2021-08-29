@@ -5,6 +5,8 @@ import static tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconD
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -16,12 +18,8 @@ import com.google.android.material.textview.MaterialTextView;
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
-import org.altbeacon.beacon.Identifier;
-import org.altbeacon.beacon.RangeNotifier;
-import org.altbeacon.beacon.Region;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.TimerTask;
@@ -55,6 +53,8 @@ public class SafetyActivity extends AppCompatActivity {
     VolleyApi volleyApi;
 
     BeaconManager beaconManager;
+    MediaPlayer mediaPlayer;
+    AudioManager audioManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,9 +133,6 @@ public class SafetyActivity extends AppCompatActivity {
     }
 
     private void startScanning() {
-        beaconManager.removeAllMonitorNotifiers();
-        beaconManager.removeAllRangeNotifiers();
-
         new Thread(() -> requestHelper.flushBluetooth()).start();
 
         beaconManager.addRangeNotifier((beaconCollection, region) -> {
@@ -196,11 +193,12 @@ public class SafetyActivity extends AppCompatActivity {
             }
         });
 
-        beaconManager.startRangingBeacons(new Region("Beacon", Identifier.parse(UUID_IBEACON_V1), null, null));
+        beaconManager.startRangingBeacons(REGION_BEACON_01);
     }
 
     private void stopScanning() {
         beaconManager.removeAllMonitorNotifiers();
+        beaconManager.stopRangingBeacons(REGION_BEACON_01);
         beaconManager.removeAllRangeNotifiers();
     }
 
@@ -224,15 +222,41 @@ public class SafetyActivity extends AppCompatActivity {
     }
 
     private void sos_Start() {
+        soundPlay();
         int imageRes = getResources().getIdentifier("sos_1", "drawable", getPackageName());
         btnSOS.setImageResource(imageRes);
         sosIsRunning = true;
     }
 
     private void sos_Stop() {
+        soundStop();
         int imageRes = getResources().getIdentifier("sos_0", "drawable", getPackageName());
         btnSOS.setImageResource(imageRes);
         sosIsRunning = false;
+    }
+
+    private void soundPlay(){
+        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        audioManager.setStreamVolume(AudioManager.STREAM_RING, 100, 0);
+
+        if(mediaPlayer == null){
+            mediaPlayer = MediaPlayer.create(this, R.raw.beepsoundeffect);
+        }
+
+        mediaPlayer.start();
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mediaPlayer.start();
+            }
+        });
+    }
+
+    private void soundStop(){
+        if(mediaPlayer != null){
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
     }
 
     private void apiTimer() {
@@ -269,7 +293,6 @@ public class SafetyActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        beaconManager.removeAllMonitorNotifiers();
-        beaconManager.removeAllRangeNotifiers();
+        stopScanning();
     }
 }

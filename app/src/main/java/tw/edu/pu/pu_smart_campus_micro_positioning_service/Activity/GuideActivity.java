@@ -140,9 +140,6 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
     }
 
     private void startScanning() {
-        beaconManager.removeAllMonitorNotifiers();
-        beaconManager.removeAllRangeNotifiers();
-
         new Thread(() -> requestHelper.flushBluetooth()).start();
 
         Log.e(TAG, "startScanning...");
