@@ -1,10 +1,6 @@
 package tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect;
 
 import android.app.Activity;
-import android.util.Log;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -15,8 +11,15 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.CheckModel;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.ShareData;
 
 public class VolleyApi {
 
@@ -34,18 +37,34 @@ public class VolleyApi {
      ***************** GET METHOD ********************
      */
     //final @NonNull String apiToken
-    public void get_API_CheckActivity(VolleyCallback callback) {
+    public void get_API_CheckActivity() {
         RequestQueue requestQueue = Volley.newRequestQueue(activity);
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, API_URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                callback.onSuccess(response);
+                ShareData shareData = new ShareData(activity);
+
+                ArrayList<CheckModel> checkModels = new ArrayList<>();
+
+                try {
+                    JSONArray allData = new JSONArray(response);
+
+                    for (int i = 0; i < allData.length(); i++) {
+                        JSONObject data = allData.getJSONObject(i);
+                        checkModels.add(i, new CheckModel(data.getString("ViewName"), String.valueOf(data.getInt("Peoplenumber"))));
+                    }
+
+                    shareData.saveData(checkModels);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                callback.onFailed(error);
+                error.printStackTrace();
             }
         }) {
             @Override

@@ -5,4 +5,6 @@ public class ShareData_Variable {
     public static final String NAME = "name";
     public static final String ROLE = "role";
     public static final String TOKEN = "token";
+
+    public static final String SPOTNAME = "viewList";
 }

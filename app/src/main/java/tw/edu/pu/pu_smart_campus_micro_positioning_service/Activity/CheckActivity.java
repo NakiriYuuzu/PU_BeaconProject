@@ -4,22 +4,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.android.volley.VolleyError;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect.VolleyApi;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Fragment.check_ChartFragment;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Fragment.check_RecycleViewFragment;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
-import tw.edu.pu.pu_smart_campus_micro_positioning_service.ViewModel.Check_ViewModel;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.ShareData;
 
 public class CheckActivity extends AppCompatActivity {
 
@@ -31,6 +29,7 @@ public class CheckActivity extends AppCompatActivity {
     LottieAnimationView animation;
 
     Fragment fragment = null;
+    ShareData shareData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +38,7 @@ public class CheckActivity extends AppCompatActivity {
 
         viewInit();
         btnInit();
-        apiData();
+        timer.schedule(timerTask, 10000, 10000);
     }
 
     private void viewInit() {
@@ -48,6 +47,8 @@ public class CheckActivity extends AppCompatActivity {
         btnChart = findViewById(R.id.btn_check_chart);
 
         animation = findViewById(R.id.check_animation);
+
+        shareData = new ShareData(this);
     }
 
     private void btnInit() {
@@ -94,37 +95,17 @@ public class CheckActivity extends AppCompatActivity {
         }
     }
 
+    Timer timer = new Timer();
+    TimerTask timerTask = new TimerTask() {
+        @Override
+        public void run() {
+            apiData();
+        }
+    };
+
     private void apiData() {
         VolleyApi volleyApi = new VolleyApi(this, "http://120.110.93.246/CAMEFSC/public/api/people");
-
-        volleyApi.get_API_CheckActivity(new VolleyApi.VolleyCallback() {
-            @Override
-            public void onSuccess(String result) {
-                try {
-                    int id = 0, pplNum = 0;
-                    String viewNames = "", dataTime = "";
-                    JSONArray allData = new JSONArray(result);
-
-                    for (int i = 0; i < allData.length(); i++) {
-                        JSONObject data = allData.getJSONObject(i);
-                        id = data.getInt("id");
-                        viewNames = data.getString("ViewName");
-                        pplNum = data.getInt("Peoplenumber");
-                        dataTime = data.getString("LogTime");
-                    }
-
-                    Log.e("checkAPI-jsonParserData", id + viewNames + pplNum + dataTime);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailed(VolleyError error) {
-                Log.e("checkAPI", error.toString());
-            }
-        });
+        volleyApi.get_API_CheckActivity();
     }
 
     @Override

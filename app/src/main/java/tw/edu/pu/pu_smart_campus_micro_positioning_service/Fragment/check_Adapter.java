@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.imageview.ShapeableImageView;
@@ -13,14 +14,16 @@ import com.google.android.material.textview.MaterialTextView;
 import java.util.ArrayList;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
-import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RecycleView_Variable;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.CheckModel;
 
 public class check_Adapter extends RecyclerView.Adapter<check_Adapter.check_ViewHolder> {
 
-    ArrayList<RecycleView_Variable> checkList;
+    ArrayList<CheckModel> checkList;
+    Fragment fragment;
 
-    public check_Adapter(ArrayList<RecycleView_Variable> checkList) {
+    public check_Adapter(ArrayList<CheckModel> checkList, Fragment fragment) {
         this.checkList = checkList;
+        this.fragment = fragment;
     }
 
     @NonNull
@@ -32,9 +35,9 @@ public class check_Adapter extends RecyclerView.Adapter<check_Adapter.check_View
 
     @Override
     public void onBindViewHolder(@NonNull check_ViewHolder holder, int position) {
-        RecycleView_Variable checkVariable = checkList.get(position);
+        CheckModel checkVariable = checkList.get(position);
         holder.spotNames.setText(checkVariable.getTitleNames());
-        //holder.spotPeople.setText(checkVariable.getNumPeople());
+        holder.spotPeople.setText(checkVariable.getNumPeople());
     }
 
     @Override

@@ -1,14 +1,18 @@
 package tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction;
 
-public class RecycleView_Variable {
-    private String titleNames, imageUrl;
-    private int numPeople;
+public class CheckModel {
+    private String titleNames, imageUrl, numPeople;
 
-    public RecycleView_Variable(String titleNames) {
+    public CheckModel(String titleNames) {
         this.titleNames = titleNames;
     }
 
-    public RecycleView_Variable(String titleNames, String imageUrl, int numPeople) {
+    public CheckModel(String titleNames, String numPeople) {
+        this.titleNames = titleNames;
+        this.numPeople = numPeople;
+    }
+
+    public CheckModel(String titleNames, String imageUrl, String numPeople) {
         this.titleNames = titleNames;
         this.imageUrl = imageUrl;
         this.numPeople = numPeople;
@@ -30,17 +34,17 @@ public class RecycleView_Variable {
         this.imageUrl = imageUrl;
     }
 
-    public int getNumPeople() {
+    public String getNumPeople() {
         return numPeople;
     }
 
-    public void setNumPeople(int numPeople) {
+    public void setNumPeople(String numPeople) {
         this.numPeople = numPeople;
     }
 
     @Override
     public String toString() {
-        return "RecycleView_Variable{" +
+        return "CheckModel{" +
                 "titleNames='" + titleNames + '\'' +
                 ", imageUrl='" + imageUrl + '\'' +
                 ", numPeople=" + numPeople +

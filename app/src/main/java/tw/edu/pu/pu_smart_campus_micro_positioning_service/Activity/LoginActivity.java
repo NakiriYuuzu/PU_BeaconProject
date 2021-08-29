@@ -77,7 +77,7 @@ public class LoginActivity extends AppCompatActivity {
         shareData = new ShareData(this);
         shareData.saveUID("");
         shareData.saveNAME("");
-        shareData.saveROLE("");
+        shareData.saveROLE("0");
         shareData.saveTOKEN("");
     }
 
@@ -117,12 +117,9 @@ public class LoginActivity extends AppCompatActivity {
 
                 try {
                     JSONObject jsonData = new JSONObject(result);
-                    String token = jsonData.getString("token");
-                    String name = "tourist";
+                    shareData.saveTOKEN(jsonData.getString("token"));
 
                     Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
-                    ii.putExtra("token", token);
-                    ii.putExtra("name", name);
 
                     guestLoginChecked = false;
 
@@ -180,6 +177,7 @@ public class LoginActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), "登入成功", Toast.LENGTH_SHORT).show();
 
                             userLoginChecked = false;
+                            clearFunction();
 
                             Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
                             startActivity(ii);
@@ -258,6 +256,11 @@ public class LoginActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void clearFunction() {
+        etAcc.setText("");
+        etPass.setText("");
     }
 
     @Override
