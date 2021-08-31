@@ -67,17 +67,9 @@ public class SafetyActivity extends AppCompatActivity {
         setContentView(R.layout.activity_safety);
 
         initView();
+        requestHelper.requestBluetooth();
         initButton();
         beaconInit();
-        requestHelper.requestBluetooth();
-        btnTEST = findViewById(R.id.btnTEST);
-        btnTEST.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                VolleyApi volleyApi = new VolleyApi(SafetyActivity.this, api_Safety_Stop);
-                volleyApi.post_API_Safety_Stop();
-            }
-        });
     }
 
     private void initButton() {
