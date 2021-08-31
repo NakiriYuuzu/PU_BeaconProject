@@ -1,6 +1,5 @@
 package tw.edu.pu.pu_smart_campus_micro_positioning_service.Activity;
 
-
 import static tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconDefine.*;
 
 import androidx.annotation.NonNull;
@@ -9,11 +8,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
+import com.android.volley.VolleyError;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -23,22 +24,27 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.RangeNotifier;
-import org.altbeacon.beacon.Region;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconDefine;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect.VolleyApi;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestHelper;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.ShareData;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.YuuzuAlertDialog;
 
 public class GuideActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -48,53 +54,20 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
     private static final long DEFAULT_FOREGROUND_SCAN_PERIOD = 1000L;
     private static final long DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD = 1000L;
 
+    private FusedLocationProviderClient client;
     private GoogleMap gMap;
-
     private BeaconManager beaconManager;
-    private BeaconDefine beaconDefine;
+    private Intent ii;
+
     private RequestHelper requestHelper;
     private YuuzuAlertDialog alertDialog;
+    private VolleyApi volleyApi;
+    private ShareData shareData;
 
     private ShapeableImageView btnBack;
 
-    private String TmpMajor;
-    private String TmpMinor;
-
-    private int CounterBeacon = 3;
-
-    private boolean AlertShow = true;
-
-    @SuppressLint("HandlerLeak")
-    Handler objHandler = new Handler() {
-
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            Bundle objBundle = msg.getData();
-            String Message = objBundle.getString("MSG_key");
-
-            Log.e("Message", Message);
-            Log.e("Counter", "CounterBeacon: " + CounterBeacon);
-            if(CounterBeacon == 3 && AlertShow) {
-                AlertShow = false;
-                alertDialog.showDialog("景點導覽", Message, new YuuzuAlertDialog.AlertCallback() {
-                    @Override
-                    public void onOkay(DialogInterface dialog, int which) {
-                        intentToGuideSpot(Message);
-                        Log.e(TAG, "onClick: " + Message);
-                        AlertShow = true;
-                        dialog.dismiss();
-                    }
-
-                    @Override
-                    public void onCancel(DialogInterface dialog, int which) {
-                        AlertShow = true;
-                        dialog.dismiss();
-                    }
-                });
-            }
-        }
-    };
+    private boolean alertChecked = false;
+    private String apiURL = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,8 +75,8 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
         setContentView(R.layout.activity_guide);
 
         initView();
-        buttonInit();
         requestHelper.requestBluetooth();
+        buttonInit();
         beaconInit();
     }
 
@@ -128,15 +101,23 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
     private void initView() {
         //findView
         btnBack = findViewById(R.id.btn_Guide_back);
-        beaconDefine = new BeaconDefine();
         requestHelper = new RequestHelper(this);
         alertDialog = new YuuzuAlertDialog(this);
+        shareData = new ShareData(this);
+
+        //API init
+        apiURL = "http://120.110.93.246/CAMEFSC/public/api/scene/" + shareData.getUID();
+        volleyApi = new VolleyApi(GuideActivity.this, apiURL);
+        volleyApi.post_API_GuideActivity_Close();
 
         // Google Maps findView
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
+
+        // Get user location findView
+        client = LocationServices.getFusedLocationProviderClient(this);
     }
 
     private void startScanning() {
@@ -157,7 +138,7 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
                         Collections.sort(beacons, (o1, o2) -> Double.compare(o2.getDistance(), o1.getDistance()));
 
                         Beacon beacon = beacons.get(0);
-                        showData(beacon);
+                        beaconData(beacon);
                     }
                 }
             }
@@ -173,77 +154,106 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
         beaconManager.stopRangingBeacons(REGION_BEACON_01);
     }
 
-    private void showData(Beacon beacon) {
+    private void beaconData(Beacon beacon) {
         String major = String.valueOf(beacon.getId2());
         String minor = String.valueOf(beacon.getId3());
+        String txpower = String.valueOf(beacon.getTxPower());
+        String rssi = String.valueOf(beacon.getRssi());
+        String distance = String.valueOf(beacon.getDistance());
 
-        Runnable objRunnable = new Runnable() {
-            final Message objMessage = objHandler.obtainMessage();
-            final Bundle objBundle = new Bundle();
+        Log.e(TAG, major + "\n" + minor + "\n" + txpower + "\n" + rssi + "\n" + distance);
 
+        apiPostData(major, minor, txpower, rssi, distance);
+    }
+
+    private void apiPostData(String major, String minor, String txpower, String rssi, String distance) {
+
+        volleyApi.post_API_GuideActivity(new VolleyApi.VolleyCallback() {
             @Override
-            public void run() {
+            public void onSuccess(String result) {
+                Log.e("onSuccess", result);
+                String spotName = "", spotNote = "", spotImage = "", spotUrl = "";
                 try {
-                    Thread.sleep(1000);
-                } catch (Exception e) {
+                    JSONArray allData = new JSONArray(result);
+                    for (int i = 0; i < allData.length(); i++) {
+                        JSONObject data = allData.getJSONObject(i);
+                        spotName = data.getString("viewname");
+                        spotNote = data.getString("note");
+                        spotImage = data.getString("image");
+                        spotUrl = data.getString("url");
+                    }
+                    if (!spotName.equals("") && !spotNote.equals("") && !spotImage.equals("") && !spotUrl.equals("")) {
+                        ii = new Intent(getApplicationContext(), GuideSpotActivity.class);
+                        ii.putExtra("spotName", spotName);
+                        ii.putExtra("spotNote", spotNote);
+                        ii.putExtra("spotImage", spotImage);
+                        ii.putExtra("spotUrl", spotUrl);
+
+                        switchAndNotify(Double.parseDouble(distance), spotName, result);
+                    }
+
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            }
 
-                if (TmpMajor == null && TmpMinor == null) {
-                    TmpMajor = major;
-                    TmpMinor = minor;
+            @Override
+            public void onFailed(VolleyError error) {
+                Log.e(TAG, error.toString());
+            }
 
-                    String str = beaconDefine.getLocationMsg(major, minor);
+        }, () -> {
+            Map<String, String> params = new HashMap<>();
+            params.put("uid", shareData.getUID());
+            params.put("major", major);
+            params.put("minor", minor);
+            params.put("txpower", txpower);
+            params.put("rssi", rssi);
+            params.put("distance", distance);
+            return params;
+        });
+    }
 
-                    objBundle.putString("MSG_key", str);
-                    objMessage.setData(objBundle);
-                    objHandler.sendMessage(objMessage);
-                }
-                else if(TmpMajor != null && TmpMinor != null){
-                    if(!TmpMajor.equals(major) && !TmpMinor.equals(minor)) {
-                        TmpMajor = major;
-                        TmpMinor = minor;
-                        CounterBeacon = 2;
+    private void apiCloseData() {
+        VolleyApi volleyApi = new VolleyApi(this, apiURL);
+        volleyApi.post_API_GuideActivity_Close();
+    }
 
-                        String str = beaconDefine.getLocationMsg(major, minor);
-
-                        objBundle.putString("MSG_key", str);
-                        objMessage.setData(objBundle);
-                        objHandler.sendMessage(objMessage);
-                    }
-                    else {
-                        String str = beaconDefine.getLocationMsg(major, minor);
-
-                        objBundle.putString("MSG_key", str);
-                        objMessage.setData(objBundle);
-                        objHandler.sendMessage(objMessage);
-
-                        CounterBeacon++;
-
-                        if (CounterBeacon >= 300) {
-                            CounterBeacon = 3;
+    private void switchAndNotify(double distance, String spotName, String result) {
+        if (distance < 0f && distance > 15f) {
+            alertChecked = false;
+        }
+        else {
+            if (!result.equals("same position")) {
+                if (!alertChecked) {
+                    alertChecked = true;
+                    alertDialog.showDialog("歡迎來到靜宜大學", "您的位置是: " + spotName + ".\n點擊確認并打開彩蛋~", new YuuzuAlertDialog.AlertCallback() {
+                        @Override
+                        public void onOkay(DialogInterface dialog, int which) {
+                            startActivity(ii);
+                            dialog.dismiss();
                         }
-                    }
+
+                        @Override
+                        public void onCancel(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
                 }
             }
-        };
-
-        Thread objBgThread = new Thread(objRunnable);
-        objBgThread.start();
+        }
     }
 
-    private void intentToGuideSpot(String str) {
-        Intent ii = new Intent(getApplicationContext(), GuideSpotActivity.class);
-        ii.putExtra("spotName", str);
-        startActivity(ii);
-    }
-
+    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         gMap = googleMap;
 
-        // 靜宜大學在Google Maps上的經緯度
-        //LatLng pu = new LatLng(24.22614525191815, 120.57709151695924);
+        // 因為已經在 PoliceMainActivity 裡請求 Location，因此此處無需再請求 Location
+        gMap.setMyLocationEnabled(true);
+
+        // 將畫面定在使用者位置，前提是使用者的位置在靜宜大學範圍內
+        ZoomToUserLocation();
 
         // 將範圍限定在靜宜大學
         LatLngBounds puBounds = new LatLngBounds(
@@ -298,6 +308,25 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
                 .strokeWidth(5));
     }
 
+    private void ZoomToUserLocation() {
+        @SuppressLint("MissingPermission")
+        Task<Location> locationTask = client.getLastLocation();
+
+        try {
+            locationTask.addOnSuccessListener(location -> {
+                if (location != null) {
+                    LatLng myLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                    gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 17));
+                }
+            });
+
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
+            Log.e("GuideActivity", "get nothing on location!");
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -320,5 +349,6 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
     protected void onDestroy() {
         super.onDestroy();
         stopScanning();
+        apiCloseData();
     }
 }

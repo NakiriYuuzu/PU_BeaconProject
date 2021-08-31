@@ -24,7 +24,6 @@ public class BeaconDefine {
         Map<String, String> ibeacon_10_Location = new HashMap<>();
         Map<String, String> ibeacon_11_Location = new HashMap<>();
         Map<String, String> ibeacon_21_Location = new HashMap<>();
-        Map<String, String> ibeacon_01_Location = new HashMap<>();
 
         // Minor
         ibeacon_10_Location.put("1221", IBEACON_10);
@@ -35,7 +34,6 @@ public class BeaconDefine {
         locations.put("122", ibeacon_10_Location);
         locations.put("123", ibeacon_11_Location);
         locations.put("1", ibeacon_21_Location);
-        locations.put("", ibeacon_01_Location);
     }
 
     public String getLocationMsg(String major, String minor) {

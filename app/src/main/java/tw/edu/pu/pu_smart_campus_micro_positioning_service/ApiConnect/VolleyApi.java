@@ -1,6 +1,7 @@
 package tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect;
 
 import android.app.Activity;
+import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -14,6 +15,7 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,9 +30,12 @@ public class VolleyApi {
     private final Activity activity;
     private final String API_URL;
 
+    private final ShareData shareData;
+
     public VolleyApi(Activity activity, String API_URL) {
         this.activity = activity;
         this.API_URL = API_URL;
+        shareData = new ShareData(activity);
     }
 
     /**
@@ -43,16 +48,17 @@ public class VolleyApi {
         StringRequest stringRequest = new StringRequest(Request.Method.GET, API_URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                ShareData shareData = new ShareData(activity);
 
                 ArrayList<CheckModel> checkModels = new ArrayList<>();
 
                 try {
-                    JSONArray allData = new JSONArray(response);
+                    JSONArray allData = new JSONArray(new String(response.getBytes(StandardCharsets.ISO_8859_1)));
+                    Log.e(TAG, allData.toString());
 
                     for (int i = 0; i < allData.length(); i++) {
                         JSONObject data = allData.getJSONObject(i);
-                        checkModels.add(i, new CheckModel(data.getString("ViewName"), String.valueOf(data.getInt("Peoplenumber"))));
+                        Log.e(TAG, data.toString());
+                        checkModels.add(i, new CheckModel(data.getString("viewname"), String.valueOf(data.getInt("peoplenumber"))));
                     }
 
                     shareData.saveData(checkModels);
@@ -64,35 +70,18 @@ public class VolleyApi {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
+                Log.e(TAG, error.toString());
             }
         }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<>();
                 headers.put("Accept", "application/json");
-                headers.put("Authorization", "Bearer + token");
+                Log.e(TAG, shareData.getTOKEN());
+                headers.put("Authorization", "Bearer" + " " + shareData.getTOKEN());
                 return headers;
             }
         };
-
-        requestQueue.add(stringRequest);
-    }
-
-    public void get_API_GuideActivity(VolleyCallback callback) {
-        RequestQueue requestQueue = Volley.newRequestQueue(activity);
-
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, API_URL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                callback.onSuccess(response);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                callback.onFailed(error);
-            }
-        });
 
         requestQueue.add(stringRequest);
     }
@@ -170,7 +159,7 @@ public class VolleyApi {
         requestQueue.add(stringRequest);
     }
 
-    public void post_API_Safety(final VolleyCallback callback) {
+    public void post_API_GuideActivity(VolleyCallback callback, VolleyPostback postback) {
         RequestQueue requestQueue = Volley.newRequestQueue(activity);
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, API_URL, new Response.Listener<String>() {
@@ -183,7 +172,126 @@ public class VolleyApi {
             public void onErrorResponse(VolleyError error) {
                 callback.onFailed(error);
             }
-        });
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                return postback.getParams();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Accept", "application/json");
+                headers.put("Authorization", "Bearer" + " " + shareData.getTOKEN());
+                return headers;
+            }
+        };
+
+        requestQueue.add(stringRequest);
+    }
+
+    public void post_API_GuideActivity_Close() {
+        RequestQueue requestQueue = Volley.newRequestQueue(activity);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, API_URL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.e(TAG, response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, error.toString());
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                HashMap<String, String> params = new HashMap<>();
+                params.put("uid", shareData.getUID());
+                params.put("major", "0");
+                params.put("minor", "0");
+                params.put("txpower", "0");
+                params.put("rssi", "0");
+                params.put("distance", "16");
+                return params;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Accept", "application/json");
+                headers.put("Authorization", "Bearer" + " " + shareData.getTOKEN());
+                return headers;
+            }
+        };
+        requestQueue.add(stringRequest);
+    }
+
+    public void post_API_Safety_Start(VolleyCallback callback, VolleyPostback postback) {
+        RequestQueue requestQueue = Volley.newRequestQueue(activity);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, API_URL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                callback.onSuccess(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                callback.onFailed(error);
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                return postback.getParams();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Accept", "application/json");
+                headers.put("Authorization", "Bearer" + " " + shareData.getTOKEN());
+                return headers;
+            }
+        };
+
+        requestQueue.add(stringRequest);
+    }
+
+    public void post_API_Safety_Stop() {
+        RequestQueue requestQueue = Volley.newRequestQueue(activity);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, API_URL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.e("safety stop", response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, error.toString());
+            }
+
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("uid", shareData.getUID());
+                params.put("major", "0");
+                params.put("minor", "0");
+                params.put("txpower", "0");
+                params.put("rssi", "0");
+                params.put("distance", "0");
+                return params;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Accept", "application/json");
+                headers.put("Authorization", "Bearer" + " " + shareData.getTOKEN());
+                return headers;
+            }
+        };
 
         requestQueue.add(stringRequest);
     }
@@ -195,5 +303,9 @@ public class VolleyApi {
     public interface VolleyCallback {
         void onSuccess(String result);
         void onFailed(VolleyError error);
+    }
+
+    public interface VolleyPostback {
+        Map<String, String> getParams();
     }
 }

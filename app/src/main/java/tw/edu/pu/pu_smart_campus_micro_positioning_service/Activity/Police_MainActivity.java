@@ -6,7 +6,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -15,6 +14,7 @@ import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 import com.permissionx.guolindev.PermissionX;
 
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect.VolleyApi;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.Login_Auto;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestHelper;
@@ -37,9 +37,9 @@ public class Police_MainActivity extends AppCompatActivity {
 
         viewInit();
         initData();
+        requestPermission();
         roleCheck();
         btnInit();
-        requestPermission();
     }
 
     private void viewInit() {
@@ -95,6 +95,10 @@ public class Police_MainActivity extends AppCompatActivity {
         btnSignOut.setOnClickListener(v -> {
             loginAuto.saveID("");
             loginAuto.savePassword("");
+            shareData.saveNAME("");
+            shareData.saveROLE("0");
+            shareData.saveUID("");
+            shareData.saveTOKEN("");
             finish();
         });
     }

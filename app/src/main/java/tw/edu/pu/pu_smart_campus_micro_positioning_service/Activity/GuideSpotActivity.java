@@ -7,32 +7,23 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-
-import tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect.VolleyApi;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 
 public class GuideSpotActivity extends AppCompatActivity {
 
-    private String spotNames = "";
-    private String imageURL = "";
-    private String infoURL = "";
+    private String spotName = "";
+    private String spotNote = "";
+    private String spotImage = "";
+    private String spotUrl = "";
 
     private MaterialTextView tvName, tvGuideInfo;
     private ShapeableImageView btnBack, ivSpotImage;
     private MaterialButton btnUrl;
-
-    VolleyApi volleyApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,54 +31,25 @@ public class GuideSpotActivity extends AppCompatActivity {
         setContentView(R.layout.activity_guide_spot);
 
         viewInit();
-        getData();
+        dataInit();
         buttonInit();
     }
 
-    private void getData() {
-        volleyApi = new VolleyApi(this, "http://120.110.93.246/volleyTest/data.php");
-        volleyApi.get_API_GuideActivity(new VolleyApi.VolleyCallback() {
-            @Override
-            public void onSuccess(String result) {
-                Log.e("onSuccess", result);
-                Log.e("spotNames", spotNames);
+    private void dataInit() {
+        Intent ii = getIntent();
+        if (ii != null) {
+            spotName = ii.getStringExtra("spotName");
+            spotNote = ii.getStringExtra("spotNote");
+            spotImage = ii.getStringExtra("spotImage");
+            spotUrl = ii.getStringExtra("spotUrl");
+        }
 
-                ArrayList<JSONObject> jsonData = new ArrayList<>();
-
-                try {
-                    JSONArray allData = new JSONArray(result);
-
-                    for (int i = 0; i < allData.length(); i++) {
-                        JSONObject data = allData.getJSONObject(i);
-                        jsonData.add(data);
-                    }
-
-                    for (int i = 0; i < jsonData.size(); i++) {
-                        if (jsonData.get(i).getString("Name").equals(spotNames)) {
-                            tvName.setText(jsonData.get(i).getString("Name"));
-                            tvGuideInfo.setText(jsonData.get(i).getString("Info"));
-
-                            Log.e("image",jsonData.get(i).getString("ImageUrl"));
-                            Log.e("infoURL",jsonData.get(i).getString("InfoUrl"));
-                            imageURL = jsonData.get(i).getString("ImageUrl");
-                            infoURL = jsonData.get(i).getString("InfoUrl");
-                        }
-                    }
-
-                    //Image loader
-                    Glide.with(GuideSpotActivity.this).load(imageURL).into(ivSpotImage);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-            @Override
-            public void onFailed(VolleyError error) {
-                Log.e("onFailed", error.toString());
-            }
-        });
+        if (!spotName.equals("") && !spotNote.equals("") && !spotImage.equals("")) {
+            tvName.setText(spotName);
+            tvGuideInfo.setText(spotNote);
+            Log.e("imageLoader", spotImage);
+            Glide.with(this).load(spotImage).into(ivSpotImage);
+        }
     }
 
     private void viewInit() {
@@ -99,15 +61,15 @@ public class GuideSpotActivity extends AppCompatActivity {
 
         Intent ii = getIntent();
         if (ii != null)
-            spotNames = ii.getStringExtra("spotName");
+            spotName = ii.getStringExtra("spotName");
     }
 
     private void buttonInit() {
         btnBack.setOnClickListener(v -> finish());
 
         btnUrl.setOnClickListener(v -> {
-            if (!infoURL.equals("")) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(infoURL)));
+            if (!spotUrl.equals("")) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(spotUrl)));
             }
         });
     }

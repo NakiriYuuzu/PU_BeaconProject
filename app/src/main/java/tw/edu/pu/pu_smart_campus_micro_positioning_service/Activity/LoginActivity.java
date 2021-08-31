@@ -109,7 +109,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void guestFunction() {
-        VolleyApi volleyApi = new VolleyApi(this, "http://120.110.93.246/CAMEFSC1/public/api/login/tourist");
+        VolleyApi volleyApi = new VolleyApi(this, "http://120.110.93.246/CAMEFSC/public/api/login/tourist");
         volleyApi.post_API_Login_Guest(requestHelper.requestIMEI(), new VolleyApi.VolleyCallback() {
             @Override
             public void onSuccess(String result) {
@@ -118,6 +118,8 @@ public class LoginActivity extends AppCompatActivity {
                 try {
                     JSONObject jsonData = new JSONObject(result);
                     shareData.saveTOKEN(jsonData.getString("token"));
+                    shareData.saveNAME("tourist");
+                    shareData.saveUID(jsonData.getString("uid"));
 
                     Intent ii = new Intent(getApplicationContext(), Police_MainActivity.class);
 
@@ -154,7 +156,7 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "請輸入賬號與密碼!", Toast.LENGTH_SHORT).show();
 
             } else {
-                VolleyApi volleyApi = new VolleyApi(LoginActivity.this, "http://120.110.93.246/CAMEFSC1/public/api/login/user");
+                VolleyApi volleyApi = new VolleyApi(LoginActivity.this, "http://120.110.93.246/CAMEFSC/public/api/login/user");
 
                 volleyApi.post_API_Login(user, pass, new VolleyApi.VolleyCallback() {
                     @Override
@@ -215,7 +217,7 @@ public class LoginActivity extends AppCompatActivity {
             String pass = loginAuto.getPassword();
 
 
-            VolleyApi volleyApi = new VolleyApi(LoginActivity.this, "http://120.110.93.246/CAMEFSC1/public/api/login/user");
+            VolleyApi volleyApi = new VolleyApi(LoginActivity.this, "http://120.110.93.246/CAMEFSC/public/api/login/user");
 
             volleyApi.post_API_Login(id, pass, new VolleyApi.VolleyCallback() {
                 @Override

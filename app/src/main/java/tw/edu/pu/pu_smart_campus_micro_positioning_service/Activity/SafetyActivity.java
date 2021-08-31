@@ -10,6 +10,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.imageview.ShapeableImageView;
@@ -43,14 +44,18 @@ public class SafetyActivity extends AppCompatActivity {
     private int count_Api = 0;
     private int count_Alert = 0;
 
+    private final String api_Safety_Start = "http://120.110.93.246/CAMEFSC/public/api/monitor/start";
+    private final String api_Safety_Stop = "http://120.110.93.246/CAMEFSC/public/api/monitor/end";
+    private final String api_SOS_Start = "http://120.110.93.246/CAMEFSC/public/api/monitor/sos";
+    private final String api_SOS_Stop = "http://120.110.93.246/CAMEFSC/public/api/monitor/sosend";
+
     LottieAnimationView animation;
-    MaterialTextView btnSafety;
+    MaterialTextView btnSafety, btnTEST;
     ShapeableImageView btnBack, btnSOS;
 
     RequestHelper requestHelper;
     BeaconStore beaconStore;
     YuuzuAlertDialog alertDialog;
-    VolleyApi volleyApi;
 
     BeaconManager beaconManager;
     MediaPlayer mediaPlayer;
@@ -65,7 +70,14 @@ public class SafetyActivity extends AppCompatActivity {
         initButton();
         beaconInit();
         requestHelper.requestBluetooth();
-
+        btnTEST = findViewById(R.id.btnTEST);
+        btnTEST.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                VolleyApi volleyApi = new VolleyApi(SafetyActivity.this, api_Safety_Stop);
+                volleyApi.post_API_Safety_Stop();
+            }
+        });
     }
 
     private void initButton() {
@@ -76,10 +88,11 @@ public class SafetyActivity extends AppCompatActivity {
 
         btnSafety.setOnClickListener(v -> {
             if (!animationRunning) {
-                alertDialog.showDialog("安全通道", "啓動此功能會實時偵測您所在的位置", new YuuzuAlertDialog.AlertCallback() {
+                alertDialog.showDialog("安全監控", "啓動此功能會實時偵測您所在的位置", new YuuzuAlertDialog.AlertCallback() {
                     @Override
                     public void onOkay(DialogInterface dialog, int which) {
                         animationStart();
+                        startScanning(api_Safety_Start);
                         dialog.dismiss();
                     }
 
@@ -90,16 +103,40 @@ public class SafetyActivity extends AppCompatActivity {
                 });
 
             } else {
+                stopScanning();
+                sos_Stop();
                 animationStop();
+                apiSafetyStop();
             }
         });
 
         btnSOS.setOnClickListener(v -> {
-            if (!sosIsRunning) {
-                alertDialog.showDialog("安全通道SOS", "此功能會直接呼叫警衛室", new YuuzuAlertDialog.AlertCallback() {
+            if (animationRunning) {
+                if (!sosIsRunning) {
+                    alertDialog.showDialog("安全通道SOS", "此功能會直接呼叫警衛室", new YuuzuAlertDialog.AlertCallback() {
+                        @Override
+                        public void onOkay(DialogInterface dialog, int which) {
+                            stopScanning();
+                            startScanning(api_SOS_Start);
+                            sos_Start();
+                            dialog.dismiss();
+                        }
+
+                        @Override
+                        public void onCancel(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                } else {
+                    sos_Stop();
+                    stopScanning();
+                    apiSosStop();
+                    startScanning(api_Safety_Start);
+                }
+            } else {
+                alertDialog.showDialog("安全通道SOS", "請麻煩先打開安全監控才能打開SOS!", new YuuzuAlertDialog.AlertCallback() {
                     @Override
                     public void onOkay(DialogInterface dialog, int which) {
-                        sos_Start();
                         dialog.dismiss();
                     }
 
@@ -108,8 +145,6 @@ public class SafetyActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
-            } else {
-                sos_Stop();
             }
         });
     }
@@ -133,7 +168,7 @@ public class SafetyActivity extends AppCompatActivity {
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25"));
     }
 
-    private void startScanning() {
+    private void startScanning(String api) {
         new Thread(() -> requestHelper.flushBluetooth()).start();
 
         beaconManager.addRangeNotifier((beaconCollection, region) -> {
@@ -152,14 +187,8 @@ public class SafetyActivity extends AppCompatActivity {
 
                     apiTimer();
 
-                    if (beacons.size() > 1) {
-                        beaconStore = new BeaconStore(SafetyActivity.this, beacons.get(0), beacons.get(1));
-                        beaconStore.beaconData(apiChecked);
-
-                    } else if (beacons.size() == 1) {
-                        beaconStore = new BeaconStore(SafetyActivity.this, beacons.get(0));
-                        beaconStore.beaconData(apiChecked);
-                    }
+                    beaconStore = new BeaconStore(SafetyActivity.this, beacons.get(0));
+                    beaconStore.beaconData(apiChecked, api);
                 }
 
             } else {
@@ -167,24 +196,21 @@ public class SafetyActivity extends AppCompatActivity {
                 if (firstChecked) {
                     Log.e(TAG, "Alert! 此道路暫時不支援安全通道。");
                     count_Animation++;
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (count_Animation == 4) {
-                                alertDialog.showDialog("安全通道", "此道路暫時不支援安全通道", new YuuzuAlertDialog.AlertCallback() {
-                                    @Override
-                                    public void onOkay(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
+                    runOnUiThread(() -> {
+                        if (count_Animation == 5) {
+                            alertDialog.showDialog("安全通道", "此道路暫時不支援安全通道!", new YuuzuAlertDialog.AlertCallback() {
+                                @Override
+                                public void onOkay(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
 
-                                    @Override
-                                    public void onCancel(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                });
-                                animationStop();
-                                count_Animation = 0;
-                            }
+                                @Override
+                                public void onCancel(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            animationStop();
+                            count_Animation = 0;
                         }
                     });
 
@@ -206,8 +232,6 @@ public class SafetyActivity extends AppCompatActivity {
     private void animationStart() {
         animation.playAnimation();
         btnSafety.setText(R.string.safety_Activate);
-
-        startScanning();
 
         animationRunning = true;
     }
@@ -236,29 +260,41 @@ public class SafetyActivity extends AppCompatActivity {
         sosIsRunning = false;
     }
 
-    private void soundPlay(){
-        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+    private void soundPlay() {
+        try {
+            audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 
-        audioManager.setStreamVolume(AudioManager.STREAM_RING, 100, 0);
+            if (audioManager.isSpeakerphoneOn()) {
+                audioManager.setStreamVolume(AudioManager.STREAM_RING, 100, 0);
 
-        if(mediaPlayer == null){
-            mediaPlayer = MediaPlayer.create(this, R.raw.beepsoundeffect);
-        }
+                if (mediaPlayer == null) {
+                    mediaPlayer = MediaPlayer.create(this, R.raw.beepsoundeffect);
+                }
 
-        mediaPlayer.start();
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
                 mediaPlayer.start();
+                mediaPlayer.setOnCompletionListener(mp -> mediaPlayer.start());
             }
-        });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    private void soundStop(){
-        if(mediaPlayer != null){
+    private void soundStop() {
+        if (mediaPlayer != null) {
             mediaPlayer.release();
             mediaPlayer = null;
         }
+    }
+
+    private void apiSafetyStop() {
+        VolleyApi volleyApi = new VolleyApi(this, api_Safety_Stop);
+        volleyApi.post_API_Safety_Stop();
+    }
+
+    private void apiSosStop() {
+        VolleyApi volleyApi = new VolleyApi(this, api_SOS_Stop);
+        volleyApi.post_API_Safety_Stop();
     }
 
     private void apiTimer() {
@@ -279,15 +315,12 @@ public class SafetyActivity extends AppCompatActivity {
     }
 
     private void dialogTimer() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Log.e(TAG, "count_Alert: " + count_Alert);
-                count_Alert++;
-                if (count_Alert >= 59) {
-                    count_Alert = 0;
-                    Log.e(TAG, "Alert!!!!!");
-                }
+        new Handler().postDelayed(() -> {
+            Log.e(TAG, "count_Alert: " + count_Alert);
+            count_Alert++;
+            if (count_Alert >= 59) {
+                count_Alert = 0;
+                Log.e(TAG, "Alert!!!!!");
             }
         }, 1000);
     }
@@ -296,5 +329,7 @@ public class SafetyActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         stopScanning();
+        apiSosStop();
+        apiSafetyStop();
     }
 }
