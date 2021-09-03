@@ -184,7 +184,7 @@ public class SafetyActivity extends AppCompatActivity {
                     Log.e(TAG, "Alert! 此道路暫時不支援安全通道。");
                     count_Animation++;
                     runOnUiThread(() -> {
-                        if (count_Animation == 5) {
+                        if (count_Animation == 3) {
                             alertDialog.showDialog("安全通道", "此道路暫時不支援安全通道!", new YuuzuAlertDialog.AlertCallback() {
                                 @Override
                                 public void onOkay(DialogInterface dialog, int which) {

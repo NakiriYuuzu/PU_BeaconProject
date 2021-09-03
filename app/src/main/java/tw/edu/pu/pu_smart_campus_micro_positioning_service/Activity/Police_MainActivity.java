@@ -71,13 +71,13 @@ public class Police_MainActivity extends AppCompatActivity {
     }
 
     private void btnInit() {
-        btnMonitor.setOnClickListener(v -> {
-            Intent ii = new Intent(getApplicationContext(), MonitorActivity.class);
+        btnGuide.setOnClickListener(v -> {
+            Intent ii = new Intent(getApplicationContext(), GuideActivity.class);
             startActivity(ii);
         });
 
-        btnGuide.setOnClickListener(v -> {
-            Intent ii = new Intent(getApplicationContext(), GuideActivity.class);
+        btnCheck.setOnClickListener(v -> {
+            Intent ii = new Intent(getApplicationContext(), CheckActivity.class);
             startActivity(ii);
         });
 
@@ -86,8 +86,8 @@ public class Police_MainActivity extends AppCompatActivity {
             startActivity(ii);
         });
 
-        btnCheck.setOnClickListener(v -> {
-            Intent ii = new Intent(getApplicationContext(), CheckActivity.class);
+        btnMonitor.setOnClickListener(v -> {
+            Intent ii = new Intent(getApplicationContext(), MonitorActivity.class);
             startActivity(ii);
         });
 
