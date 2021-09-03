@@ -8,7 +8,7 @@
     tools:context=".Activity.CheckActivity">
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/btn_check_back"
+        android:id="@+id/btn_SpotInfo_back"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="30dp"
@@ -27,7 +27,7 @@
         android:textColor="?attr/colorPrimaryVariant"
         android:textSize="30sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@+id/btn_check_back"
+        app:layout_constraintStart_toEndOf="@+id/btn_SpotInfo_back"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout

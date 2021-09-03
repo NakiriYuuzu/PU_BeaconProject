@@ -10,7 +10,6 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.View;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.imageview.ShapeableImageView;
@@ -27,6 +26,7 @@ import java.util.TimerTask;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect.VolleyApi;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Beacon.BeaconStore;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.DefaultSetting;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.YuuzuAlertDialog;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestHelper;
@@ -44,13 +44,8 @@ public class SafetyActivity extends AppCompatActivity {
     private int count_Api = 0;
     private int count_Alert = 0;
 
-    private final String api_Safety_Start = "http://120.110.93.246/CAMEFSC/public/api/monitor/start";
-    private final String api_Safety_Stop = "http://120.110.93.246/CAMEFSC/public/api/monitor/end";
-    private final String api_SOS_Start = "http://120.110.93.246/CAMEFSC/public/api/monitor/sos";
-    private final String api_SOS_Stop = "http://120.110.93.246/CAMEFSC/public/api/monitor/sosend";
-
     LottieAnimationView animation;
-    MaterialTextView btnSafety, btnTEST;
+    MaterialTextView btnSafety;
     ShapeableImageView btnBack, btnSOS;
 
     RequestHelper requestHelper;
@@ -84,7 +79,7 @@ public class SafetyActivity extends AppCompatActivity {
                     @Override
                     public void onOkay(DialogInterface dialog, int which) {
                         animationStart();
-                        startScanning(api_Safety_Start);
+                        startScanning(DefaultSetting.API_SAFETY_MONITOR_START);
                         dialog.dismiss();
                     }
 
@@ -109,7 +104,7 @@ public class SafetyActivity extends AppCompatActivity {
                         @Override
                         public void onOkay(DialogInterface dialog, int which) {
                             stopScanning();
-                            startScanning(api_SOS_Start);
+                            startScanning(DefaultSetting.API_SAFETY_SOS_START);
                             sos_Start();
                             dialog.dismiss();
                         }
@@ -123,7 +118,7 @@ public class SafetyActivity extends AppCompatActivity {
                     sos_Stop();
                     stopScanning();
                     apiSosStop();
-                    startScanning(api_Safety_Start);
+                    startScanning(DefaultSetting.API_SAFETY_MONITOR_START);
                 }
             } else {
                 alertDialog.showDialog("安全通道SOS", "請麻煩先打開安全監控才能打開SOS!", new YuuzuAlertDialog.AlertCallback() {
@@ -202,6 +197,7 @@ public class SafetyActivity extends AppCompatActivity {
                                 }
                             });
                             animationStop();
+                            sos_Stop();
                             count_Animation = 0;
                         }
                     });
@@ -280,12 +276,12 @@ public class SafetyActivity extends AppCompatActivity {
     }
 
     private void apiSafetyStop() {
-        VolleyApi volleyApi = new VolleyApi(this, api_Safety_Stop);
+        VolleyApi volleyApi = new VolleyApi(this, DefaultSetting.API_SAFETY_MONITOR_END);
         volleyApi.post_API_Safety_Stop();
     }
 
     private void apiSosStop() {
-        VolleyApi volleyApi = new VolleyApi(this, api_SOS_Stop);
+        VolleyApi volleyApi = new VolleyApi(this, DefaultSetting.API_SAFETY_SOS_END);
         volleyApi.post_API_Safety_Stop();
     }
 

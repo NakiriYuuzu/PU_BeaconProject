@@ -6,37 +6,35 @@
     Add this on activity for doInBackground
     android:launchMode="singleInstance"
     -->
-
-    <!--Internet-->
+    <!-- Internet -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-
-    <!--Bluetooth-->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- Bluetooth -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <uses-feature
         android:name="android.hardware.bluetooth_le"
-        android:required="true" />
-
-    <!--GPS-->
+        android:required="true" /> <!-- GPS -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_Title"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:screenOrientation="portrait"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Pu_Smart_Campus_MicroPositioning_Service">
+        android:theme="@style/Theme.Pu_Smart_Campus_MicroPositioning_Service"
+        android:usesCleartextTraffic="true">
+        <activity
+            android:name=".Activity.GuideSpotUrlActivity"
+            android:exported="true" />
         <activity
             android:name=".Activity.GuideSpotActivity"
-            android:screenOrientation="portrait"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Activity.CheckActivity"
             android:exported="true"
@@ -65,17 +63,15 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".Activity.Police_MainActivity"
-            android:screenOrientation="portrait"
-            android:exported="true" >
-        </activity>
+            android:exported="true"
+            android:screenOrientation="portrait"></activity>
 
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_map_key"/>
-
+            android:value="@string/google_map_key" />
     </application>
 
 </manifest>

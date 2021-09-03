@@ -20,6 +20,7 @@ import org.json.JSONObject;
 
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect.VolleyApi;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.DefaultSetting;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.Login_Auto;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestHelper;
@@ -109,7 +110,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void guestFunction() {
-        VolleyApi volleyApi = new VolleyApi(this, "http://120.110.93.246/CAMEFSC/public/api/login/tourist");
+        VolleyApi volleyApi = new VolleyApi(this, DefaultSetting.API_GUESTLOGIN);
         volleyApi.post_API_Login_Guest(requestHelper.requestIMEI(), new VolleyApi.VolleyCallback() {
             @Override
             public void onSuccess(String result) {
@@ -156,7 +157,7 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "請輸入賬號與密碼!", Toast.LENGTH_SHORT).show();
 
             } else {
-                VolleyApi volleyApi = new VolleyApi(LoginActivity.this, "http://120.110.93.246/CAMEFSC/public/api/login/user");
+                VolleyApi volleyApi = new VolleyApi(LoginActivity.this, DefaultSetting.API_LOGIN);
 
                 volleyApi.post_API_Login(user, pass, new VolleyApi.VolleyCallback() {
                     @Override
@@ -217,7 +218,7 @@ public class LoginActivity extends AppCompatActivity {
             String pass = loginAuto.getPassword();
 
 
-            VolleyApi volleyApi = new VolleyApi(LoginActivity.this, "http://120.110.93.246/CAMEFSC/public/api/login/user");
+            VolleyApi volleyApi = new VolleyApi(LoginActivity.this, DefaultSetting.API_LOGIN);
 
             volleyApi.post_API_Login(id, pass, new VolleyApi.VolleyCallback() {
                 @Override

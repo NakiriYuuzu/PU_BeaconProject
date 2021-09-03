@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect.VolleyApi;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.DefaultSetting;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestHelper;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.ShareData;
@@ -57,7 +58,6 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
     private FusedLocationProviderClient client;
     private GoogleMap gMap;
     private BeaconManager beaconManager;
-    private Intent ii;
 
     private RequestHelper requestHelper;
     private YuuzuAlertDialog alertDialog;
@@ -106,7 +106,7 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
         shareData = new ShareData(this);
 
         //API init
-        apiURL = "http://120.110.93.246/CAMEFSC/public/api/scene/" + shareData.getUID();
+        apiURL = DefaultSetting.API_GUIDE + shareData.getUID();
         volleyApi = new VolleyApi(GuideActivity.this, apiURL);
         volleyApi.post_API_GuideActivity_Close();
 
@@ -183,11 +183,10 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
                         spotUrl = data.getString("url");
                     }
                     if (!spotName.equals("") && !spotNote.equals("") && !spotImage.equals("") && !spotUrl.equals("")) {
-                        ii = new Intent(getApplicationContext(), GuideSpotActivity.class);
-                        ii.putExtra("spotName", spotName);
-                        ii.putExtra("spotNote", spotNote);
-                        ii.putExtra("spotImage", spotImage);
-                        ii.putExtra("spotUrl", spotUrl);
+                        shareData.saveSpotTitle(spotName);
+                        shareData.saveSpotInfo(spotNote);
+                        shareData.saveSpotImage(spotImage);
+                        shareData.saveSpotUrl(spotUrl);
 
                         switchAndNotify(Double.parseDouble(distance), spotName, result);
                     }
@@ -230,6 +229,7 @@ public class GuideActivity extends AppCompatActivity implements OnMapReadyCallba
                     alertDialog.showDialog("歡迎來到靜宜大學", "您的位置是: " + spotName + ".\n點擊確認并打開彩蛋~", new YuuzuAlertDialog.AlertCallback() {
                         @Override
                         public void onOkay(DialogInterface dialog, int which) {
+                            Intent ii = new Intent(getApplicationContext(), GuideSpotActivity.class);
                             startActivity(ii);
                             dialog.dismiss();
                         }

@@ -14,6 +14,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect.VolleyApi;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.DefaultSetting;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Fragment.check_ChartFragment;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.Fragment.check_RecycleViewFragment;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
@@ -42,7 +43,7 @@ public class CheckActivity extends AppCompatActivity {
     }
 
     private void viewInit() {
-        btnBack = findViewById(R.id.btn_check_back);
+        btnBack = findViewById(R.id.btn_SpotInfo_back);
         btnDetail = findViewById(R.id.btn_check_detail);
         btnChart = findViewById(R.id.btn_check_chart);
 
@@ -104,7 +105,7 @@ public class CheckActivity extends AppCompatActivity {
     };
 
     private void apiData() {
-        VolleyApi volleyApi = new VolleyApi(this, "http://120.110.93.246/CAMEFSC/public/api/people");
+        VolleyApi volleyApi = new VolleyApi(this, DefaultSetting.API_CHECK);
         volleyApi.get_API_CheckActivity();
     }
 

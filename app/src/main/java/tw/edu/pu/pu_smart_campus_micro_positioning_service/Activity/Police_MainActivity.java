@@ -14,7 +14,6 @@ import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 import com.permissionx.guolindev.PermissionX;
 
-import tw.edu.pu.pu_smart_campus_micro_positioning_service.ApiConnect.VolleyApi;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.Login_Auto;
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.RequestHelper;

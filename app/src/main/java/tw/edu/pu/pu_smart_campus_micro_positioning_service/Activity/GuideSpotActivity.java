@@ -13,6 +13,7 @@ import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 
 import tw.edu.pu.pu_smart_campus_micro_positioning_service.R;
+import tw.edu.pu.pu_smart_campus_micro_positioning_service.VariableAndFunction.ShareData;
 
 public class GuideSpotActivity extends AppCompatActivity {
 
@@ -36,12 +37,12 @@ public class GuideSpotActivity extends AppCompatActivity {
     }
 
     private void dataInit() {
-        Intent ii = getIntent();
-        if (ii != null) {
-            spotName = ii.getStringExtra("spotName");
-            spotNote = ii.getStringExtra("spotNote");
-            spotImage = ii.getStringExtra("spotImage");
-            spotUrl = ii.getStringExtra("spotUrl");
+        ShareData shareData = new ShareData(this);
+        if (!shareData.getSpotTitle().equals("") && !shareData.getSpotInfo().equals("") && !shareData.getSpotImage().equals("") && !shareData.getSpotUrl().equals("")) {
+            spotName = shareData.getSpotTitle();
+            spotNote = shareData.getSpotInfo();
+            spotImage = shareData.getSpotImage();
+            spotUrl = shareData.getSpotUrl();
         }
 
         if (!spotName.equals("") && !spotNote.equals("") && !spotImage.equals("")) {
@@ -56,12 +57,8 @@ public class GuideSpotActivity extends AppCompatActivity {
         tvName = findViewById(R.id.tvName);
         ivSpotImage = findViewById(R.id.ivSpotImage);
         btnUrl = findViewById(R.id.btnUrl);
-        btnBack = findViewById(R.id.btn_check_back);
+        btnBack = findViewById(R.id.btn_SpotInfo_back);
         tvGuideInfo = findViewById(R.id.tvGuideInfo);
-
-        Intent ii = getIntent();
-        if (ii != null)
-            spotName = ii.getStringExtra("spotName");
     }
 
     private void buttonInit() {
@@ -69,7 +66,8 @@ public class GuideSpotActivity extends AppCompatActivity {
 
         btnUrl.setOnClickListener(v -> {
             if (!spotUrl.equals("")) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(spotUrl)));
+                Intent ii = new Intent(getApplicationContext(), GuideSpotUrlActivity.class);
+                startActivity(ii);
             }
         });
     }

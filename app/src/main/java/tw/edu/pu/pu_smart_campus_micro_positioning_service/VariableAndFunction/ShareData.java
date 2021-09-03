@@ -27,6 +27,10 @@ public class ShareData {
         this.checkModels = checkModels;
     }
 
+    /**
+     **************** Login Activity *****************
+     */
+
     public void saveUID(String uid) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();
@@ -74,6 +78,62 @@ public class ShareData {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         return preferences.getString(TOKEN, "");
     }
+
+    /**
+     **************** Guide Activity *****************
+     */
+
+    public void saveSpotTitle(String spotTitle) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(SPOTTITLE, spotTitle);
+        editor.apply();
+    }
+
+    public String getSpotTitle() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getString(SPOTTITLE, "");
+    }
+
+    public void saveSpotInfo(String spotInfo) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(SPOTINFO, spotInfo);
+        editor.apply();
+    }
+
+    public String getSpotInfo() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getString(SPOTINFO, "");
+    }
+
+    public void saveSpotImage(String spotImage) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(SPOTIMAGE, spotImage);
+        editor.apply();
+    }
+
+    public String getSpotImage() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getString(SPOTIMAGE, "");
+    }
+
+    public void saveSpotUrl(String spotUrl) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(SPOTURL, spotUrl);
+        editor.apply();
+    }
+
+    public String getSpotUrl() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getString(SPOTURL, "");
+    }
+
+    /**
+     **************** Check Activity *****************
+     */
 
     public void saveData(ArrayList<CheckModel> checkModels) {
         this.checkModels = checkModels;
