@@ -59,6 +59,13 @@ public class check_ChartFragment extends Fragment {
         data.setValueTextSize(12f);
         barChart.setData(data);
 
+        Description description = new Description();
+        description.setText("人數");
+
+        barChart.setDescription(description);
+        barChart.getDescription().setTextSize(12f);
+        barChart.getDescription().setTextColor(R.color.w);
+
         XAxis xAxis = barChart.getXAxis();
         xAxis.setValueFormatter(new IndexAxisValueFormatter(labelNames));
         xAxis.setTextSize(12f);

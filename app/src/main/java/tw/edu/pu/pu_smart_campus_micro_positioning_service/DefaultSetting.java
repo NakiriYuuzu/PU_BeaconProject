@@ -1,6 +1,10 @@
 package tw.edu.pu.pu_smart_campus_micro_positioning_service;
 
 public class DefaultSetting {
+    /**
+     * Api Url Setting
+     */
+
     //LoginActivity
     public static String API_LOGIN = "http://120.110.93.246/CAMEFSC/public/api/login/user";
     public static String API_GUESTLOGIN = "http://120.110.93.246/CAMEFSC/public/api/login/tourist";
